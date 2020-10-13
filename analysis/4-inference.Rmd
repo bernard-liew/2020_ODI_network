@@ -1,0 +1,84 @@
+---
+title: "4-inference"
+author: "bernard-liew"
+date: "2020-10-12"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Load package
+
+```{r}
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(tidyverse,
+               qgraph,
+               stats,
+               bootnet,
+               igraph,
+               mgm,
+               NetworkComparisonTest,
+               doParallel,
+               huge)
+```
+
+## Import model
+
+```{r}
+res <- readRDS("output/raw.RDS")
+
+```
+
+## Pairwise comparison
+
+```{r}
+pair <- t (combn(1:5, 2))
+
+```
+
+## Weighted network comparison for model without group
+
+```{r}
+
+doParallel::registerDoParallel(4)
+
+
+nct_pairs_wt <-  foreach (n = 1:nrow (pair)) %dopar% {
+  NetworkComparisonTest:: NCT (data1 = res$data[[pair[n,1]]],
+                               data2 = res$data[[pair[n,2]]],
+                               paired = TRUE,
+                               weighted = TRUE,
+                               test.centrality = TRUE,
+                               test.edges =  TRUE,
+                               nodes = "all")
+}
+
+```
+
+## Unweighted network comparison for model without group
+
+```{r}
+
+doParallel::registerDoParallel(4)
+
+
+nct_pairs_unwt <-  foreach (n = 1:nrow (pair)) %dopar% {
+  NetworkComparisonTest:: NCT (data1 = res$data[[pair[n,1]]],
+                               data2 = res$data[[pair[n,2]]],
+                               paired = TRUE,
+                               weighted = FALSE,
+                               test.centrality = TRUE,
+                               test.edges =  TRUE,
+                               nodes = "all")
+}
+
+```
+
+## Save models
+
+```{r}
+saveRDS(list (nct_wt = nct_pairs_unwt,
+              nct_unwt = nct_pairs_unwt),
+        file = "output/nct.RDS")
+```
+

@@ -1,0 +1,367 @@
+---
+title: "2-network"
+author: "bernard-liew"
+date: "2020-10-08"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Load package
+
+```{r}
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(tidyverse,
+               qgraph,
+               stats,
+               bootnet,
+               igraph,
+               mgm,
+               NetworkComparisonTest,
+               rio,
+               furrr,
+               cowplot,
+               doParallel,
+               huge,
+               EGAnet)
+```
+
+## Import data
+
+```{r}
+rm(list = ls())
+df <- readRDS("output/dat_odi_nest.RDS")
+
+```
+
+## Reorganize data
+
+```{r}
+temp1 <- df$raw %>% select (-data_mgm)
+temp2 <- df$com %>% select (-data_mgm) %>% rename (data_com = data)
+temp3 <- temp1 %>%
+  inner_join(temp2, by = "time")
+
+temp4 <- df$raw %>% select (-data) %>% rename (data = data_mgm)
+temp5 <- df$com %>% select (-data) %>% rename (data_com = data_mgm)
+temp6 <- temp4 %>%
+  inner_join(temp5, by = "time")
+
+df <- list (odi = temp3, 
+            odi_mgm = temp6)
+
+rm (list = ls(pattern = "temp"))
+```
+
+
+## Network analysis
+
+### Set boot number
+
+```{r}
+B <- 2000
+```
+
+
+```{r}
+
+stats_type <- c("edge", "strength", "betweenness", "expectedInfluence", "closeness")
+
+my_huge <- function (df) {
+
+  df[, grepl ("Q", names(df))] <- huge.npn (df[, grepl ("Q", names(df))] )
+
+  return (df)
+
+}
+
+```
+
+### Analyse without groups as variable
+
+#### Analyse data with missing
+
+```{r}
+dat <- df$odi 
+
+plan (multisession)
+set.seed(1)
+
+res_raw <- dat %>%
+  select (time, data) %>%
+  # Transform data
+  mutate (data = map(data, huge.npn)) %>%
+  # Estimate network
+  mutate (nw = map (data,
+                    estimateNetwork,
+                    default="EBICglasso",
+                    corMethod = "cor",
+                    tuning = 0.5,
+                    lambda.min.ratio = 0.001,
+                    corArgs =
+                      list(method = "pearson",
+                           use = "pairwise.complete.obs")),
+          # Get centrality measures
+          centr = map (nw, centralityTable),
+          # Bootstrap by case to get stability of centrality
+          centr_stb = future_map (nw,
+                                  bootnet,
+                                  default="EBICglasso",
+                                  corMethod = "cor",
+                                  tuning = 0.5,
+                                  lambda.min.ratio = 0.001,
+                                  nBoots = B,
+                                  type = "case",
+                                  statistics = stats_type,
+                                  corArgs =
+                                    list(method = "pearson",
+                                         use = "pairwise.complete.obs")),
+          # Stability measure
+          cor_stb = map (centr_stb,
+                         corStability),
+          # Bootstrap to get edgeweights stability
+          edgewts = future_map (nw,
+                                bootnet,
+                                default="EBICglasso",
+                                corMethod = "cor",
+                                tuning = 0.5,
+                                lambda.min.ratio = 0.001,
+                                nBoots = B,
+                                corArgs =
+                                  list(method = "pearson",
+                                       use = "pairwise.complete.obs")))
+
+saveRDS(res_raw, "output/raw.RDS")
+
+
+```
+
+
+#### Analyse data with complete
+
+```{r}
+plan (multisession)
+set.seed(1)
+
+res_com <- dat %>%
+  select (time, data_com) %>%
+  rename (data = data_com) %>%
+  # Transform data
+  mutate (data = map(data, huge.npn)) %>%
+  # Estimate network
+  mutate (nw = map (data,
+                    estimateNetwork,
+                    default="EBICglasso",
+                    corMethod = "cor",
+                    tuning = 0.5,
+                    lambda.min.ratio = 0.001,
+                    corArgs =
+                      list(method = "pearson",
+                           use = "pairwise.complete.obs")),
+          # Get centrality measures
+          centr = map (nw, centralityTable),
+          # Bootstrap by case to get stability of centrality
+          centr_stb = future_map (nw,
+                                  bootnet,
+                                  default="EBICglasso",
+                                  corMethod = "cor",
+                                  tuning = 0.5,
+                                  lambda.min.ratio = 0.001,
+                                  nBoots = B,
+                                  type = "case",
+                                  statistics = stats_type,
+                                  corArgs =
+                                    list(method = "pearson",
+                                         use = "pairwise.complete.obs")),
+          # Stability measure
+          cor_stb = map (centr_stb,
+                         corStability),
+          # Bootstrap to get edgeweights stability
+          edgewts = future_map (nw,
+                                bootnet,
+                                default="EBICglasso",
+                                corMethod = "cor",
+                                tuning = 0.5,
+                                lambda.min.ratio = 0.001,
+                                nBoots = B,
+                                corArgs =
+                                  list(method = "pearson",
+                                       use = "pairwise.complete.obs")))
+
+saveRDS(res_com, "output/com.RDS")
+
+```
+
+### Analyse with groups as variable
+
+#### Analyse data with missing
+
+```{r}
+dat <- df$odi_mgm 
+set.seed(1)
+
+res_mgm_raw <- dat %>%
+  select (time, data) %>%
+  # Transform data
+  mutate (data = map(data, my_huge)) %>%
+  # Estimate network
+  mutate (nw = map (data,
+                    estimateNetwork,
+                    default = "mgm",
+                     type= c("c", rep("g", 10)),
+                     level= c(2, rep(1, 10)),
+                     criterion  = "CV",            # we used cross validation to select optimal tuning parameter
+                     nFolds = 10,            # using 10 folds
+                     order = 2,                       # we only include second order interactions
+                     binarySign = TRUE,
+                     scale = TRUE,
+                    .pbar = FALSE,
+                    .signInfo = FALSE)) %>%
+  # Get centrality measures
+  mutate (centr = map (nw, centralityTable)) 
+
+
+# Furrr throws up error with mgm, switched to doParallel
+# Bootstrap by case to get stability of centrality
+doParallel::registerDoParallel(4)
+B <- 2000
+
+centr_stb_list <- list()
+
+centr_stb_list <-  foreach (n = 1: nrow (dat)) %dopar% {
+  bootnet::bootnet (res_mgm_raw$data[[n]],
+                     default = "mgm",
+                     .type= c("c", rep("g", 10)),
+                     level= c(2, rep(1, 10)),
+                     criterion  = "CV",          
+                     nFolds = 10,            
+                     order = 2,                       
+                     binarySign = TRUE,
+                     scale = TRUE,
+                    .pbar = FALSE,
+                    .signInfo = FALSE,
+                    nBoots = B,
+                    type = "case",
+                    statistics = stats_type)
+  
+}
+
+res_mgm_raw$centr_stb <- centr_stb_list
+
+# Stability measure
+res_mgm_raw <- res_mgm_raw %>%
+  mutate (cor_stb = map (centr_stb,
+                         corStability))
+
+# Bootstrap by case to get stability of centrality
+edgewts_list <- list()
+
+edgewts_list <-  foreach (n = 1: nrow (dat)) %dopar% {
+  bootnet::bootnet (res_mgm_raw$nw[[n]],
+                    default = "mgm",
+                     .type= c("c", rep("g", 10)),
+                     level= c(2, rep(1, 10)),
+                     criterion  = "CV",          
+                     nFolds = 10,            
+                     order = 2,                       
+                     binarySign = TRUE,
+                     scale = TRUE,
+                    .pbar = FALSE,
+                    .signInfo = FALSE,
+                    nBoots = B)
+  
+}
+
+res_mgm_raw$edgewts <- edgewts_list
+
+saveRDS(res_mgm_raw, "output/mgm_raw.RDS")
+
+```
+
+
+#### Analyse data with complete
+
+```{r}
+
+set.seed(1)
+
+res_mgm_com <- dat %>%
+  select (time, data_com) %>%
+  rename (data = data_com) %>%
+  # Transform data
+  mutate (data = map(data, my_huge)) %>%
+  # Estimate network
+  mutate (nw = map (data,
+                    estimateNetwork,
+                    default = "mgm",
+                     type= c("c", rep("g", 10)),
+                     level= c(2, rep(1, 10)),
+                     criterion  = "CV",            # we used cross validation to select optimal tuning parameter
+                     nFolds = 10,            # using 10 folds
+                     order = 2,                       # we only include second order interactions
+                     binarySign = TRUE,
+                     scale = TRUE,
+                    .pbar = FALSE,
+                    .signInfo = FALSE)) %>%
+  # Get centrality measures
+  mutate (centr = map (nw, centralityTable)) 
+
+
+# Furrr throws up error with mgm, switched to doParallel
+# Bootstrap by case to get stability of centrality
+doParallel::registerDoParallel(4)
+B <- 2000
+
+centr_stb_list <- list()
+
+centr_stb_list <-  foreach (n = 1: nrow (dat)) %dopar% {
+  bootnet::bootnet (res_mgm_com$data[[n]],
+                     default = "mgm",
+                     .type= c("c", rep("g", 10)),
+                     level= c(2, rep(1, 10)),
+                     criterion  = "CV",          
+                     nFolds = 10,            
+                     order = 2,                       
+                     binarySign = TRUE,
+                     scale = TRUE,
+                    .pbar = FALSE,
+                    .signInfo = FALSE,
+                    nBoots = B,
+                    type = "case",
+                    statistics = stats_type)
+  
+}
+
+res_mgm_com$centr_stb <- centr_stb_list
+
+# Stability measure
+res_mgm_com <- res_mgm_com %>%
+  mutate (cor_stb = map (centr_stb,
+                         corStability))
+
+# Bootstrap by case to get stability of centrality
+doParallel::registerDoParallel(4)
+edgewts_list <- list()
+
+edgewts_list <-  foreach (n = 1: nrow (dat)) %dopar% {
+  bootnet::bootnet (res_mgm_com$nw[[n]],
+                    default = "mgm",
+                     .type= c("c", rep("g", 10)),
+                     level= c(2, rep(1, 10)),
+                     criterion  = "CV",          
+                     nFolds = 10,            
+                     order = 2,                       
+                     binarySign = TRUE,
+                     scale = TRUE,
+                    .pbar = FALSE,
+                    .signInfo = FALSE,
+                    nBoots = B)
+  
+}
+
+res_mgm_com$edgewts <- edgewts_list
+
+saveRDS(res_mgm_com, "output/mgm_com.RDS")
+
+```
+

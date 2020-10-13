@@ -1,0 +1,98 @@
+---
+title: "1-Explore"
+author: "bernard-liew"
+date: "2020-10-08"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Load package
+
+```{r}
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(tidyverse,
+               mice)
+
+```
+
+## Import merged data
+
+```{r}
+rm(list = ls())
+
+df_all <- readRDS("output/dat_odi.RDS")
+```
+
+
+## Plot frequency of item 
+
+```{r}
+
+freq <- df_all %>%
+  pivot_longer(cols = matches ("Q"),
+               names_to = "qn",
+               values_to = "ans") %>%
+  mutate (ans = factor (ans, levels = as.character(seq (0,5,1)), ordered = TRUE))
+
+ggplot (freq) +
+  geom_histogram(aes (x = ans), stat = "count") +
+  facet_wrap(time ~ qn, ncol = 10)
+
+```
+
+## Remove subjects with more than 50% missing columns
+
+```{r}
+missing_per_indv <- (rowSums(is.na(df_all))/ ncol (df_all)) * 100 
+
+df_all <- df_all[missing_per_indv < 50, ] 
+
+```
+
+## Impute missing data
+
+```{r}
+pred <- make.predictorMatrix(df_all)
+pred[,c("subj", "grp", "time")] <- 0
+
+
+df_complete <- mice (df_all, 
+                     m = 1,
+                     method = "polr",
+                     pred = pred,
+                     seed = 101)
+
+df_com <- complete (df_complete)
+
+
+```
+
+
+## Created nested dataframes
+
+```{r}
+df_nest <- df_all %>%
+  mutate (grp = as.numeric(grp) - 1) %>%
+  select (-subj) %>%
+  group_by(time) %>%
+  nest(.key = "data_mgm") %>%
+  mutate (data = map (data_mgm, ~.x %>% select (-grp)))
+
+df_com_nest <- df_com %>%
+  mutate (grp = as.numeric(grp) - 1) %>%
+  select (-subj) %>%
+  group_by(time) %>%
+  nest(.key = "data_mgm") %>%
+  mutate (data = map (data_mgm, ~.x %>% select (-grp)))
+
+df <- list (raw = df_nest,
+            com = df_com_nest)
+
+```
+
+## Export nested data
+
+```{r}
+saveRDS(df, "output/dat_odi_nest.RDS")
+```
