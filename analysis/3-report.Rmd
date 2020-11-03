@@ -16,6 +16,7 @@ pacman::p_load(tidyverse,
                stats,
                bootnet,
                igraph,
+               plotrix,
                mgm,
                NetworkComparisonTest,
                rio,
@@ -34,6 +35,10 @@ pacman::p_load(tidyverse,
 # ODI custom figure
 nodeLabels <- c("Pain Intensity", "Personal Care", "Lifting", "Walking", "Sitting",
                 "Standing", "Sleeping", "Sex life", "Social life", "Travelling")
+ques <- paste0("Q", 1:10)
+
+node_df <- data.frame("Item" = ques,
+                      "Variable" = nodeLabels)
 ```
 
 
@@ -50,14 +55,21 @@ res <- readRDS("output/raw.RDS")
 
 ```{r}
 
-tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_network.tiff")
+#tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_network.tiff")
 par (mfrow = c(2,3))
 p1 <- plot (res$nw[[1]], title = "Baseline", label.cex = 1.5, vsize = 10)
 plot (res$nw[[2]], title = "Week 5", layout = p1$layout, label.cex = 1.5, vsize = 10)
 plot (res$nw[[3]], title = "Week 10", layout = p1$layout, label.cex = 1.5, vsize = 10)
 plot (res$nw[[4]], title = "Week 26", layout = p1$layout, label.cex = 1.5, vsize = 10)
 plot (res$nw[[5]], title = "Week 52", layout = p1$layout, label.cex = 1.5, vsize = 10)
-dev.off()
+plot.new()
+addtable2plot(0,0,node_df, 
+              xpad=1, ypad=1,
+              bty='o',
+              display.rownames = FALSE, 
+              hlines = TRUE,
+              vlines = TRUE)
+#dev.off()
 
 ```
 
@@ -66,9 +78,9 @@ dev.off()
 ```{r}
 # Plot centrality
 c_fig <- map (res$nw, centralityPlot, include = "all")
-tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_strength.tiff")
+#tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_strength.tiff")
 cowplot::plot_grid(plotlist = c_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = 0)
-dev.off()
+#dev.off()
 
 ```
 
@@ -77,9 +89,9 @@ dev.off()
 ```{r}
 # Plot centrality stability
 s_fig <- map (res$centr_stb, plot, statistics = c("closeness", "strength", "betweenness"))
-tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_stability.tiff")
+#tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_stability.tiff")
 cowplot::plot_grid(plotlist = s_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = 0)
-dev.off()
+#dev.off()
 
 ```
 
@@ -104,15 +116,6 @@ cowplot::plot_grid(plotlist = w_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", 
 
 ## Report network with group as variable
 
-### ODI labels
-
-```{r}
-# ODI custom figure
-nodeLabels <- c("Pain Intensity", "Personal Care", "Lifting", "Walking", "Sitting",
-                "Standing", "Sleeping", "Sex life", "Social life", "Travelling")
-```
-
-
 ### Load models
 
 ```{r}
@@ -126,14 +129,21 @@ res <- readRDS("output/mgm_raw.RDS")
 
 ```{r}
 
-tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_network.tiff")
+#tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_network.tiff")
 par (mfrow = c(2,3))
 p1 <- plot (res$nw[[1]], title = "Baseline", label.cex = 1.5, vsize = 10)
 plot (res$nw[[2]], title = "Week 5", layout = p1$layout, label.cex = 1.5, vsize = 10)
 plot (res$nw[[3]], title = "Week 10", layout = p1$layout, label.cex = 1.5, vsize = 10)
 plot (res$nw[[4]], title = "Week 26", layout = p1$layout, label.cex = 1.5, vsize = 10)
 plot (res$nw[[5]], title = "Week 52", layout = p1$layout, label.cex = 1.5, vsize = 10)
-dev.off()
+plot.new()
+addtable2plot(0,0,node_df, 
+              xpad=1, ypad=1,
+              bty='o',
+              display.rownames = FALSE, 
+              hlines = TRUE,
+              vlines = TRUE)
+#dev.off()
 
 ```
 
@@ -142,9 +152,9 @@ dev.off()
 ```{r}
 # Plot centrality
 c_fig <- map (res$nw, centralityPlot, include = "all")
-tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_strength.tiff")
+#tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_strength.tiff")
 cowplot::plot_grid(plotlist = c_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = 0)
-dev.off()
+#dev.off()
 
 ```
 
@@ -153,9 +163,9 @@ dev.off()
 ```{r}
 # Plot centrality stability
 s_fig <- map (res$centr_stb, plot, statistics = c("closeness", "strength", "betweenness"))
-tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_stability.tiff")
+#tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_stability.tiff")
 cowplot::plot_grid(plotlist = s_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = 0)
-dev.off()
+#dev.off()
 
 ```
 
