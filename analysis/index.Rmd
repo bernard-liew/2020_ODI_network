@@ -9,3 +9,9 @@ editor_options:
 ---
 
 Welcome to my research website.
+
+Welcome to this website which aims to uncover the dynamics of change in disability in individuals with low back pain.
+
+[This code performs network analysis on ODI](2-network.html)
+
+[This code reports the results of the network analysis](3-report.html)

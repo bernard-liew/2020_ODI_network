@@ -53,6 +53,12 @@ res <- readRDS("output/raw.RDS")
 
 ### Plot network
 
+Blue edges - positive correlation
+
+Red edges - negative correlation
+
+The thickness of the edges indicate the magnitude of correlation.
+
 ```{r}
 
 #tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_network.tiff")
@@ -75,9 +81,17 @@ addtable2plot(0,0,node_df,
 
 ### Plot centrality
 
+Strength - sum of direct connections a given node has in the network
+
+Betweenness - shortest paths that go through the node under investigation
+
+Closeness - sum of shortest paths from the node under investigation to all other nodes in the network
+
+Expected influence - sum of a node's connections and represents the relative importance of a node in a network
+
 ```{r}
 # Plot centrality
-c_fig <- map (res$nw, centralityPlot, include = "all")
+c_fig <- map (res$nw, centralityPlot, include = "all", print = FALSE)
 #tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_strength.tiff")
 cowplot::plot_grid(plotlist = c_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = 0)
 #dev.off()
@@ -86,16 +100,21 @@ cowplot::plot_grid(plotlist = c_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", 
 
 ### Plot centrality stability
 
+Is the centrality order stable?
+
 ```{r}
 # Plot centrality stability
 s_fig <- map (res$centr_stb, plot, statistics = c("closeness", "strength", "betweenness"))
 #tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_stability.tiff")
-cowplot::plot_grid(plotlist = s_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = 0)
+cowplot::plot_grid(plotlist = s_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = -1)
 #dev.off()
 
 ```
 
 ### Get CS coefficient
+
+The stability of centrality estimation, and results in a centrality-stability coefficient (CS-coefficient) that should not be lower than 0.25 and preferably above 0.5
+
 
 ```{r}
 cs_coef <- res %>%
@@ -108,9 +127,11 @@ cs_coef <- res %>%
 
 ### Plot edge weights stability
 
+See which edges differ from each other in size significantly (to answer the question is edge A significantly larger than edge B).
+
 ```{r}
 w_fig <- map (res$edgewts, plot, labels = FALSE)
-cowplot::plot_grid(plotlist = w_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = 0)
+cowplot::plot_grid(plotlist = w_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = -1)
 
 ```
 
@@ -127,6 +148,12 @@ res <- readRDS("output/mgm_raw.RDS")
 
 ### Plot network
 
+Blue edges - positive correlation
+
+Red edges - negative correlation
+
+The thickness of the edges indicate the magnitude of correlation.
+
 ```{r}
 
 #tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_network.tiff")
@@ -149,9 +176,17 @@ addtable2plot(0,0,node_df,
 
 ### Plot centrality
 
+Strength - sum of direct connections a given node has in the network
+
+Betweenness - shortest paths that go through the node under investigation
+
+Closeness - sum of shortest paths from the node under investigation to all other nodes in the network
+
+Expected influence - sum of a node's connections and represents the relative importance of a node in a network
+
 ```{r}
 # Plot centrality
-c_fig <- map (res$nw, centralityPlot, include = "all")
+c_fig <- map (res$nw, centralityPlot, include = "all", print = FALSE)
 #tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_strength.tiff")
 cowplot::plot_grid(plotlist = c_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = 0)
 #dev.off()
@@ -160,16 +195,20 @@ cowplot::plot_grid(plotlist = c_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", 
 
 ### Plot centrality stability
 
+Is the centrality order stable?
+
 ```{r}
 # Plot centrality stability
 s_fig <- map (res$centr_stb, plot, statistics = c("closeness", "strength", "betweenness"))
 #tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_stability.tiff")
-cowplot::plot_grid(plotlist = s_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = 0)
+cowplot::plot_grid(plotlist = s_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = -1)
 #dev.off()
 
 ```
 
 ### Get CS coefficient
+
+The stability of centrality estimation, and results in a centrality-stability coefficient (CS-coefficient) that should not be lower than 0.25 and preferably above 0.5
 
 ```{r}
 cs_coef <- res %>%
@@ -182,8 +221,10 @@ cs_coef <- res %>%
 
 ### Plot edge weights stability
 
+See which edges differ from each other in size significantly (to answer the question is edge A significantly larger than edge B).
+
 ```{r}
 w_fig <- map (res$edgewts, plot, labels = FALSE)
-cowplot::plot_grid(plotlist = w_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = 0)
+cowplot::plot_grid(plotlist = w_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = -1)
 
 ```
