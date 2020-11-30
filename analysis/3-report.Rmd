@@ -81,19 +81,34 @@ addtable2plot(0,0,node_df,
 
 ### Plot centrality
 
-Strength - sum of direct connections a given node has in the network
+High centrality nodes have strong connections to many other nodes, and act as hubs that connect otherwise disparate nodes to one another. 
 
-Betweenness - shortest paths that go through the node under investigation
+Low centrality nodes exist on the periphery of the network, with fewer and weaker connections to other nodes of the
+network.
 
-Closeness - sum of shortest paths from the node under investigation to all other nodes in the network
+Strength is the sum of the absolute value of its connections with other nodes in the network.
 
-Expected influence - sum of a node's connections and represents the relative importance of a node in a network
+Degree can be straightforwardly generalized to weighted networks by considering the sum of the weights of the connections (in absolute value), instead of their number. This generalization is called strength.
 
-```{r}
+Closeness centrality is defined as the inverse of the sum of the distances of the focal node from all the other nodes in the network. Closeness is the average shortest path between a given node and the remaining nodes in the network. Nodes with higher closeness are more proximally connected to the rest of the network.
+
+Betweenness is the number of times in which a given node lies on the shortest path between two other nodes.
+
+Expected influence is the sum of a node’s connections and represents the relative importance of a node in a network (Robinaugh et al., 2016) --relative because even in weakly connected networks (with overall low edge weights), there will always be a node with a high expected influence in case of standardized results.
+
+The greater the value of centrality indices to one, the more important the variable.
+
+```{r fig.height=20, fig.width=15}
 # Plot centrality
-c_fig <- map (res$nw, centralityPlot, include = "all", print = FALSE)
+c_fig <- map (res$nw, centralityPlot, include = "all", print = FALSE, scale = "relative")
+
+c_fig <- map (c_fig, ~.x + 
+                  scale_x_continuous(breaks= c(0, 0.5, 1), lim = c(0, 1)) + 
+                  theme(text = element_text(size = 20), 
+                        axis.text.x = element_text(angle = 90, hjust = 1)), 
+              include = "all", print = FALSE, scale = "relative")
 #tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_strength.tiff")
-cowplot::plot_grid(plotlist = c_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = 0)
+cowplot::plot_grid(plotlist = c_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = 0, ncol = 2)
 #dev.off()
 
 ```
@@ -102,11 +117,18 @@ cowplot::plot_grid(plotlist = c_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", 
 
 Is the centrality order stable?
 
-```{r}
+```{r fig.height=20, fig.width=15}
 # Plot centrality stability
 s_fig <- map (res$centr_stb, plot, statistics = c("closeness", "strength", "betweenness"))
+
+s_fig <- map (s_fig, ~.x + 
+                ylab ("Ave Corr") + 
+                  theme(text = element_text(size = 20), 
+                        axis.text.x = element_text(angle = 90, hjust = 1)), 
+              include = "all", print = FALSE, scale = "relative")
+
 #tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_stability.tiff")
-cowplot::plot_grid(plotlist = s_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = -1)
+cowplot::plot_grid(plotlist = s_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = -1, ncol = 2)
 #dev.off()
 
 ```
@@ -116,12 +138,16 @@ cowplot::plot_grid(plotlist = s_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", 
 The stability of centrality estimation, and results in a centrality-stability coefficient (CS-coefficient) that should not be lower than 0.25 and preferably above 0.5
 
 
-```{r}
+```{r, results = "asis"}
 cs_coef <- res %>%
   select (time, cor_stb) %>%
   unnest () %>%
   ungroup() %>%
-  mutate (measure = rep (c("betweenness", "closeness", "edge", "expectedInfluence", "strength"), 5))
+  mutate (measure = rep (c("betweenness", "closeness", "edge", "expectedInfluence", "strength"), 5)) %>%
+  mutate (cor_stb = round (cor_stb, 2))
+
+cs_coef %>%
+  knitr::kable (caption = "Stability of centrality indices")
 
 ```
 
@@ -129,9 +155,14 @@ cs_coef <- res %>%
 
 See which edges differ from each other in size significantly (to answer the question is edge A significantly larger than edge B).
 
-```{r}
-w_fig <- map (res$edgewts, plot, labels = FALSE)
-cowplot::plot_grid(plotlist = w_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = -1)
+```{r fig.height=40, fig.width=15}
+w_fig <- map (res$edgewts, plot, order = "sample")
+
+w_fig <- map (w_fig, ~.x + 
+                  theme(text = element_text(size = 16)), 
+              include = "all", print = FALSE, scale = "relative")
+
+cowplot::plot_grid(plotlist = w_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = -1, ncol = 1)
 
 ```
 
@@ -176,19 +207,35 @@ addtable2plot(0,0,node_df,
 
 ### Plot centrality
 
-Strength - sum of direct connections a given node has in the network
+High centrality nodes have strong connections to many other nodes, and act as hubs that connect otherwise disparate nodes to one another. 
 
-Betweenness - shortest paths that go through the node under investigation
+Low centrality nodes exist on the periphery of the network, with fewer and weaker connections to other nodes of the
+network.
 
-Closeness - sum of shortest paths from the node under investigation to all other nodes in the network
+Strength is the sum of the absolute value of its connections with other nodes in the network.
 
-Expected influence - sum of a node's connections and represents the relative importance of a node in a network
+Degree can be straightforwardly generalized to weighted networks by considering the sum of the weights of the connections (in absolute value), instead of their number. This generalization is called strength.
 
-```{r}
+Closeness centrality is defined as the inverse of the sum of the distances of the focal node from all the other nodes in the network. Closeness is the average shortest path between a given node and the remaining nodes in the network. Nodes with higher closeness are more proximally connected to the rest of the network.
+
+Betweenness is the number of times in which a given node lies on the shortest path between two other nodes.
+
+Expected influence is the sum of a node’s connections and represents the relative importance of a node in a network (Robinaugh et al., 2016) --relative because even in weakly connected networks (with overall low edge weights), there will always be a node with a high expected influence in case of standardized results.
+
+The greater the value of centrality indices to one, the more important the variable.
+
+```{r fig.height=20, fig.width=15}
 # Plot centrality
-c_fig <- map (res$nw, centralityPlot, include = "all", print = FALSE)
+c_fig <- map (res$nw, centralityPlot, include = "all", print = FALSE, scale = "relative")
+
+c_fig <- map (c_fig, ~.x + 
+                  scale_x_continuous(breaks= c(0, 0.5, 1), lim = c(0, 1)) + 
+                  theme(text = element_text(size = 20), 
+                        axis.text.x = element_text(angle = 90, hjust = 1)), 
+              include = "all", print = FALSE, scale = "relative")
+
 #tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_strength.tiff")
-cowplot::plot_grid(plotlist = c_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = 0)
+cowplot::plot_grid(plotlist = c_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = 0, ncol = 2)
 #dev.off()
 
 ```
@@ -197,11 +244,19 @@ cowplot::plot_grid(plotlist = c_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", 
 
 Is the centrality order stable?
 
-```{r}
+```{r fig.height=20, fig.width=15}
 # Plot centrality stability
 s_fig <- map (res$centr_stb, plot, statistics = c("closeness", "strength", "betweenness"))
+
+s_fig <- map (s_fig, ~.x + 
+                ylab ("Ave Corr") + 
+                  theme(text = element_text(size = 20), 
+                        axis.text.x = element_text(angle = 90, hjust = 1)), 
+              include = "all", print = FALSE, scale = "relative")
+
+
 #tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_stability.tiff")
-cowplot::plot_grid(plotlist = s_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = -1)
+cowplot::plot_grid(plotlist = s_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = -1, ncol = 2)
 #dev.off()
 
 ```
@@ -210,12 +265,16 @@ cowplot::plot_grid(plotlist = s_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", 
 
 The stability of centrality estimation, and results in a centrality-stability coefficient (CS-coefficient) that should not be lower than 0.25 and preferably above 0.5
 
-```{r}
+```{r, results = "asis"}
 cs_coef <- res %>%
   select (time, cor_stb) %>%
   unnest () %>%
   ungroup() %>%
-  mutate (measure = rep (c("betweenness", "closeness", "edge", "expectedInfluence", "strength"), 5))
+  mutate (measure = rep (c("betweenness", "closeness", "edge", "expectedInfluence", "strength"), 5)) %>%
+  mutate (cor_stb = round (cor_stb, 2))
+
+cs_coef %>%
+  knitr::kable (caption = "Stability of centrality indices")
 
 ```
 
@@ -223,8 +282,13 @@ cs_coef <- res %>%
 
 See which edges differ from each other in size significantly (to answer the question is edge A significantly larger than edge B).
 
-```{r}
-w_fig <- map (res$edgewts, plot, labels = FALSE)
-cowplot::plot_grid(plotlist = w_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = -1)
+```{r fig.height=40, fig.width=15}
+w_fig <- map (res$edgewts, plot, order = "sample")
+
+w_fig <- map (w_fig, ~.x + 
+                  theme(text = element_text(size = 16)), 
+              include = "all", print = FALSE, scale = "relative")
+
+cowplot::plot_grid(plotlist = w_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = -1, ncol = 1)
 
 ```
