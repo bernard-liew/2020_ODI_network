@@ -34,7 +34,7 @@ pacman::p_load(tidyverse,
 ```{r}
 # ODI custom figure
 nodeLabels <- c("Pain Intensity", "Personal Care", "Lifting", "Walking", "Sitting",
-                "Standing", "Sleeping", "Sex life", "Social life", "Travelling")
+                "Standing", "Sleeping", "Social life", "Travelling", "Work/Housework")
 ques <- paste0("Q", 1:10)
 
 node_df <- data.frame("Item" = ques,
@@ -79,6 +79,38 @@ addtable2plot(0,0,node_df,
 
 ```
 
+### Plot edge weights stability
+
+#### Confidence interval
+
+See which edges differ from each other in size significantly (to answer the question is edge A significantly larger than edge B).
+
+```{r fig.height=40, fig.width=15, message=FALSE, warning=FALSE}
+w_fig <- map (res$edgewts, plot, order = "sample")
+
+w_fig <- map (w_fig, ~.x + 
+                  theme(text = element_text(size = 16)), 
+              include = "all", print = FALSE, scale = "relative")
+
+cowplot::plot_grid(plotlist = w_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = -1, ncol = 1)
+
+```
+
+#### Hypothesis testing
+
+```{r fig.height=15, fig.width=15, message=FALSE, warning=FALSE}
+wp_fig <- map (res$edgewts, plot, plot = "difference", 
+              satistics = "edge", order = "sample", onlyNonZero = TRUE)
+
+
+wp_fig <- map (wp_fig, ~.x + 
+                  theme(text = element_text(size = 16)), 
+              include = "all", print = FALSE, scale = "relative")
+
+cowplot::plot_grid(plotlist = wp_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = -1, ncol = 3)
+
+```
+
 ### Plot centrality
 
 High centrality nodes have strong connections to many other nodes, and act as hubs that connect otherwise disparate nodes to one another. 
@@ -98,7 +130,7 @@ Expected influence is the sum of a node’s connections and represents the relat
 
 The greater the value of centrality indices to one, the more important the variable.
 
-```{r fig.height=20, fig.width=15}
+```{r fig.height=20, fig.width=15, message=FALSE, warning=FALSE}
 # Plot centrality
 c_fig <- map (res$nw, centralityPlot, include = "all", print = FALSE, scale = "relative")
 
@@ -117,7 +149,7 @@ cowplot::plot_grid(plotlist = c_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", 
 
 Is the centrality order stable?
 
-```{r fig.height=20, fig.width=15}
+```{r fig.height=20, fig.width=15, message=FALSE, warning=FALSE}
 # Plot centrality stability
 s_fig <- map (res$centr_stb, plot, statistics = c("closeness", "strength", "betweenness"))
 
@@ -138,7 +170,7 @@ cowplot::plot_grid(plotlist = s_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", 
 The stability of centrality estimation, and results in a centrality-stability coefficient (CS-coefficient) that should not be lower than 0.25 and preferably above 0.5
 
 
-```{r, results = "asis"}
+```{r, results = "asis", message=FALSE, warning=FALSE}
 cs_coef <- res %>%
   select (time, cor_stb) %>%
   unnest () %>%
@@ -151,30 +183,22 @@ cs_coef %>%
 
 ```
 
-### Plot edge weights stability
-
-See which edges differ from each other in size significantly (to answer the question is edge A significantly larger than edge B).
-
-```{r fig.height=40, fig.width=15}
-w_fig <- map (res$edgewts, plot, order = "sample")
-
-w_fig <- map (w_fig, ~.x + 
-                  theme(text = element_text(size = 16)), 
-              include = "all", print = FALSE, scale = "relative")
-
-cowplot::plot_grid(plotlist = w_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = -1, ncol = 1)
-
-```
 
 ## Report network with group as variable
 
 ### Load models
+
+Individualised PT coded as 1.
+
+Advise coded as 0.
 
 ```{r}
 # Model with missing data as input
 res <- readRDS("output/mgm_raw.RDS")
 # Model with complete imputed data as input
 #res <- readRDS("output/com.RDS")
+
+nodes <- colnames (res$data[[1]])
 ```
 
 ### Plot network
@@ -205,6 +229,38 @@ addtable2plot(0,0,node_df,
 
 ```
 
+### Plot edge weights stability
+#### Confidence interval
+
+See which edges differ from each other in size significantly (to answer the question is edge A significantly larger than edge B).
+
+```{r fig.height=40, fig.width=15, message=FALSE, warning=FALSE}
+w_fig <- map (res$edgewts, plot, order = "sample")
+
+w_fig <- map (w_fig, ~.x + 
+                  theme(text = element_text(size = 16)), 
+              include = "all", print = FALSE, scale = "relative")
+
+cowplot::plot_grid(plotlist = w_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = -1, ncol = 1)
+
+```
+
+#### Hypothesis testing
+
+```{r fig.height=15, fig.width=15, message=FALSE, warning=FALSE}
+wp_fig <- map (res$edgewts, plot, plot = "difference", 
+              satistics = "edge", order = "sample", onlyNonZero = TRUE)
+
+
+wp_fig <- map (wp_fig, ~.x + 
+                  theme(text = element_text(size = 16)), 
+              include = "all", print = FALSE, scale = "relative")
+
+cowplot::plot_grid(plotlist = wp_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = -1, ncol = 3)
+
+```
+
+
 ### Plot centrality
 
 High centrality nodes have strong connections to many other nodes, and act as hubs that connect otherwise disparate nodes to one another. 
@@ -224,11 +280,11 @@ Expected influence is the sum of a node’s connections and represents the relat
 
 The greater the value of centrality indices to one, the more important the variable.
 
-```{r fig.height=20, fig.width=15}
+```{r fig.height=20, fig.width=15, message=FALSE, warning=FALSE}
 # Plot centrality
-c_fig <- map (res$nw, centralityPlot, include = "all", print = FALSE, scale = "relative")
-
-c_fig <- map (c_fig, ~.x + 
+c_fig <- map (res$nw, centralityPlot, include = "all", 
+              print = FALSE, scale = "relative", labels = nodes) %>%
+  map (~.x + 
                   scale_x_continuous(breaks= c(0, 0.5, 1), lim = c(0, 1)) + 
                   theme(text = element_text(size = 20), 
                         axis.text.x = element_text(angle = 90, hjust = 1)), 
@@ -244,7 +300,7 @@ cowplot::plot_grid(plotlist = c_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", 
 
 Is the centrality order stable?
 
-```{r fig.height=20, fig.width=15}
+```{r fig.height=20, fig.width=15, message=FALSE, warning=FALSE}
 # Plot centrality stability
 s_fig <- map (res$centr_stb, plot, statistics = c("closeness", "strength", "betweenness"))
 
@@ -265,7 +321,7 @@ cowplot::plot_grid(plotlist = s_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", 
 
 The stability of centrality estimation, and results in a centrality-stability coefficient (CS-coefficient) that should not be lower than 0.25 and preferably above 0.5
 
-```{r, results = "asis"}
+```{r, results = "asis", message=FALSE, warning=FALSE}
 cs_coef <- res %>%
   select (time, cor_stb) %>%
   unnest () %>%
@@ -278,17 +334,4 @@ cs_coef %>%
 
 ```
 
-### Plot edge weights stability
 
-See which edges differ from each other in size significantly (to answer the question is edge A significantly larger than edge B).
-
-```{r fig.height=40, fig.width=15}
-w_fig <- map (res$edgewts, plot, order = "sample")
-
-w_fig <- map (w_fig, ~.x + 
-                  theme(text = element_text(size = 16)), 
-              include = "all", print = FALSE, scale = "relative")
-
-cowplot::plot_grid(plotlist = w_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = -1, ncol = 1)
-
-```

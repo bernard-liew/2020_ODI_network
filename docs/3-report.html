@@ -416,7 +416,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-11-30
+<strong>Last updated:</strong> 2020-12-01
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
@@ -507,16 +507,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombernardliew2020ODInetworktree8bd4b9a68f815dfb0ff9c5d915769c81ccf98509targetblank8bd4b9aa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/bernard-liew/2020_ODI_network/tree/8bd4b9a68f815dfb0ff9c5d915769c81ccf98509" target="_blank">8bd4b9a</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombernardliew2020ODInetworktree035fa50ca05e77b84c9ee97a4973bfb432e933fftargetblank035fa50a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/bernard-liew/2020_ODI_network/tree/035fa50ca05e77b84c9ee97a4973bfb432e933ff" target="_blank">035fa50</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcombernardliew2020ODInetworktree8bd4b9a68f815dfb0ff9c5d915769c81ccf98509targetblank8bd4b9aa" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcombernardliew2020ODInetworktree035fa50ca05e77b84c9ee97a4973bfb432e933fftargetblank035fa50a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/bernard-liew/2020_ODI_network/tree/8bd4b9a68f815dfb0ff9c5d915769c81ccf98509" target="_blank">8bd4b9a</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/bernard-liew/2020_ODI_network/tree/035fa50ca05e77b84c9ee97a4973bfb432e933ff" target="_blank">035fa50</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -566,6 +566,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/bernard-liew/2020_ODI_network/blob/035fa50ca05e77b84c9ee97a4973bfb432e933ff/analysis/3-report.Rmd" target="_blank">035fa50</a>
+</td>
+<td>
+bernard-liew
+</td>
+<td>
+2020-11-30
+</td>
+<td>
+altered report graphics size
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/bernard-liew/2020_ODI_network/035fa50ca05e77b84c9ee97a4973bfb432e933ff/docs/3-report.html" target="_blank">035fa50</a>
+</td>
+<td>
+bernard-liew
+</td>
+<td>
+2020-11-30
+</td>
+<td>
+altered report graphics size
+</td>
+</tr>
 <tr>
 <td>
 html
@@ -684,7 +718,7 @@ initial network analysis
 <h3>ODI labels</h3>
 <pre class="r"><code># ODI custom figure
 nodeLabels &lt;- c(&quot;Pain Intensity&quot;, &quot;Personal Care&quot;, &quot;Lifting&quot;, &quot;Walking&quot;, &quot;Sitting&quot;,
-                &quot;Standing&quot;, &quot;Sleeping&quot;, &quot;Sex life&quot;, &quot;Social life&quot;, &quot;Travelling&quot;)
+                &quot;Standing&quot;, &quot;Sleeping&quot;, &quot;Social life&quot;, &quot;Travelling&quot;, &quot;Work/Housework&quot;)
 ques &lt;- paste0(&quot;Q&quot;, 1:10)
 
 node_df &lt;- data.frame(&quot;Item&quot; = ques,
@@ -719,6 +753,34 @@ addtable2plot(0,0,node_df,
 <p><img src="figure/3-report.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>#dev.off()</code></pre>
 </div>
+<div id="plot-edge-weights-stability" class="section level3">
+<h3>Plot edge weights stability</h3>
+<div id="confidence-interval" class="section level4">
+<h4>Confidence interval</h4>
+<p>See which edges differ from each other in size significantly (to answer the question is edge A significantly larger than edge B).</p>
+<pre class="r"><code>w_fig &lt;- map (res$edgewts, plot, order = &quot;sample&quot;)
+
+w_fig &lt;- map (w_fig, ~.x + 
+                  theme(text = element_text(size = 16)), 
+              include = &quot;all&quot;, print = FALSE, scale = &quot;relative&quot;)
+
+cowplot::plot_grid(plotlist = w_fig, labels = c(&quot;Wk0&quot;,&quot;Wk 5&quot;, &quot;Wk 10&quot;, &quot;Wk 26&quot;, &quot;wk52&quot; ), vjust = 1, hjust = -1, ncol = 1)</code></pre>
+<p><img src="figure/3-report.Rmd/unnamed-chunk-5-1.png" width="1440" style="display: block; margin: auto;" /></p>
+</div>
+<div id="hypothesis-testing" class="section level4">
+<h4>Hypothesis testing</h4>
+<pre class="r"><code>wp_fig &lt;- map (res$edgewts, plot, plot = &quot;difference&quot;, 
+              satistics = &quot;edge&quot;, order = &quot;sample&quot;, onlyNonZero = TRUE)
+
+
+wp_fig &lt;- map (wp_fig, ~.x + 
+                  theme(text = element_text(size = 16)), 
+              include = &quot;all&quot;, print = FALSE, scale = &quot;relative&quot;)
+
+cowplot::plot_grid(plotlist = wp_fig, labels = c(&quot;Wk0&quot;,&quot;Wk 5&quot;, &quot;Wk 10&quot;, &quot;Wk 26&quot;, &quot;wk52&quot; ), vjust = 1, hjust = -1, ncol = 3)</code></pre>
+<p><img src="figure/3-report.Rmd/unnamed-chunk-6-1.png" width="1440" style="display: block; margin: auto;" /></p>
+</div>
+</div>
 <div id="plot-centrality" class="section level3">
 <h3>Plot centrality</h3>
 <p>High centrality nodes have strong connections to many other nodes, and act as hubs that connect otherwise disparate nodes to one another.</p>
@@ -730,51 +792,25 @@ addtable2plot(0,0,node_df,
 <p>Expected influence is the sum of a node’s connections and represents the relative importance of a node in a network (Robinaugh et al., 2016) –relative because even in weakly connected networks (with overall low edge weights), there will always be a node with a high expected influence in case of standardized results.</p>
 <p>The greater the value of centrality indices to one, the more important the variable.</p>
 <pre class="r"><code># Plot centrality
-c_fig &lt;- map (res$nw, centralityPlot, include = &quot;all&quot;, print = FALSE, scale = &quot;relative&quot;)</code></pre>
-<pre><code>Note: relative centrality indices are shown on x-axis rather than raw centrality indices.
-Note: relative centrality indices are shown on x-axis rather than raw centrality indices.
-Note: relative centrality indices are shown on x-axis rather than raw centrality indices.
-Note: relative centrality indices are shown on x-axis rather than raw centrality indices.
-Note: relative centrality indices are shown on x-axis rather than raw centrality indices.</code></pre>
-<pre class="r"><code>c_fig &lt;- map (c_fig, ~.x + 
+c_fig &lt;- map (res$nw, centralityPlot, include = &quot;all&quot;, print = FALSE, scale = &quot;relative&quot;)
+
+c_fig &lt;- map (c_fig, ~.x + 
                   scale_x_continuous(breaks= c(0, 0.5, 1), lim = c(0, 1)) + 
                   theme(text = element_text(size = 20), 
                         axis.text.x = element_text(angle = 90, hjust = 1)), 
               include = &quot;all&quot;, print = FALSE, scale = &quot;relative&quot;)
 #tiff(width = 15, height = 15, units = &quot;in&quot;, res = 100, file = &quot;output/odi_strength.tiff&quot;)
 cowplot::plot_grid(plotlist = c_fig, labels = c(&quot;Wk0&quot;,&quot;Wk 5&quot;, &quot;Wk 10&quot;, &quot;Wk 26&quot;, &quot;wk52&quot; ), vjust = 1, hjust = 0, ncol = 2)</code></pre>
-<p><img src="figure/3-report.Rmd/unnamed-chunk-5-1.png" width="1440" style="display: block; margin: auto;" /></p>
+<p><img src="figure/3-report.Rmd/unnamed-chunk-7-1.png" width="1440" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>#dev.off()</code></pre>
 </div>
 <div id="plot-centrality-stability" class="section level3">
 <h3>Plot centrality stability</h3>
 <p>Is the centrality order stable?</p>
 <pre class="r"><code># Plot centrality stability
-s_fig &lt;- map (res$centr_stb, plot, statistics = c(&quot;closeness&quot;, &quot;strength&quot;, &quot;betweenness&quot;))</code></pre>
-<pre><code>Warning: `filter_()` is deprecated as of dplyr 0.7.0.
-Please use `filter()` instead.
-See vignette(&#39;programming&#39;) for more help
-This warning is displayed once every 8 hours.
-Call `lifecycle::last_warnings()` to see where this warning was generated.</code></pre>
-<pre><code>Warning: `select_()` is deprecated as of dplyr 0.7.0.
-Please use `select()` instead.
-This warning is displayed once every 8 hours.
-Call `lifecycle::last_warnings()` to see where this warning was generated.</code></pre>
-<pre><code>Warning: `arrange_()` is deprecated as of dplyr 0.7.0.
-Please use `arrange()` instead.
-See vignette(&#39;programming&#39;) for more help
-This warning is displayed once every 8 hours.
-Call `lifecycle::last_warnings()` to see where this warning was generated.</code></pre>
-<pre><code>Warning: `summarise_()` is deprecated as of dplyr 0.7.0.
-Please use `summarise()` instead.
-This warning is displayed once every 8 hours.
-Call `lifecycle::last_warnings()` to see where this warning was generated.</code></pre>
-<pre><code>Warning: `group_by_()` is deprecated as of dplyr 0.7.0.
-Please use `group_by()` instead.
-See vignette(&#39;programming&#39;) for more help
-This warning is displayed once every 8 hours.
-Call `lifecycle::last_warnings()` to see where this warning was generated.</code></pre>
-<pre class="r"><code>s_fig &lt;- map (s_fig, ~.x + 
+s_fig &lt;- map (res$centr_stb, plot, statistics = c(&quot;closeness&quot;, &quot;strength&quot;, &quot;betweenness&quot;))
+
+s_fig &lt;- map (s_fig, ~.x + 
                 ylab (&quot;Ave Corr&quot;) + 
                   theme(text = element_text(size = 20), 
                         axis.text.x = element_text(angle = 90, hjust = 1)), 
@@ -782,7 +818,7 @@ Call `lifecycle::last_warnings()` to see where this warning was generated.</code
 
 #tiff(width = 15, height = 15, units = &quot;in&quot;, res = 100, file = &quot;output/odi_stability.tiff&quot;)
 cowplot::plot_grid(plotlist = s_fig, labels = c(&quot;Wk0&quot;,&quot;Wk 5&quot;, &quot;Wk 10&quot;, &quot;Wk 26&quot;, &quot;wk52&quot; ), vjust = 1, hjust = -1, ncol = 2)</code></pre>
-<p><img src="figure/3-report.Rmd/unnamed-chunk-6-1.png" width="1440" style="display: block; margin: auto;" /></p>
+<p><img src="figure/3-report.Rmd/unnamed-chunk-8-1.png" width="1440" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>#dev.off()</code></pre>
 </div>
 <div id="get-cs-coefficient" class="section level3">
@@ -793,10 +829,9 @@ cowplot::plot_grid(plotlist = s_fig, labels = c(&quot;Wk0&quot;,&quot;Wk 5&quot;
   unnest () %&gt;%
   ungroup() %&gt;%
   mutate (measure = rep (c(&quot;betweenness&quot;, &quot;closeness&quot;, &quot;edge&quot;, &quot;expectedInfluence&quot;, &quot;strength&quot;), 5)) %&gt;%
-  mutate (cor_stb = round (cor_stb, 2))</code></pre>
-<pre><code>Warning: `cols` is now required when using unnest().
-Please use `cols = c(cor_stb)`</code></pre>
-<pre class="r"><code>cs_coef %&gt;%
+  mutate (cor_stb = round (cor_stb, 2))
+
+cs_coef %&gt;%
   knitr::kable (caption = &quot;Stability of centrality indices&quot;)</code></pre>
 <table>
 <caption>Stability of centrality indices</caption>
@@ -936,31 +971,19 @@ Please use `cols = c(cor_stb)`</code></pre>
 </tbody>
 </table>
 </div>
-<div id="plot-edge-weights-stability" class="section level3">
-<h3>Plot edge weights stability</h3>
-<p>See which edges differ from each other in size significantly (to answer the question is edge A significantly larger than edge B).</p>
-<pre class="r"><code>w_fig &lt;- map (res$edgewts, plot, order = &quot;sample&quot;)</code></pre>
-<pre><code>Warning: `mutate_()` is deprecated as of dplyr 0.7.0.
-Please use `mutate()` instead.
-See vignette(&#39;programming&#39;) for more help
-This warning is displayed once every 8 hours.
-Call `lifecycle::last_warnings()` to see where this warning was generated.</code></pre>
-<pre class="r"><code>w_fig &lt;- map (w_fig, ~.x + 
-                  theme(text = element_text(size = 16)), 
-              include = &quot;all&quot;, print = FALSE, scale = &quot;relative&quot;)
-
-cowplot::plot_grid(plotlist = w_fig, labels = c(&quot;Wk0&quot;,&quot;Wk 5&quot;, &quot;Wk 10&quot;, &quot;Wk 26&quot;, &quot;wk52&quot; ), vjust = 1, hjust = -1, ncol = 1)</code></pre>
-<p><img src="figure/3-report.Rmd/unnamed-chunk-8-1.png" width="1440" style="display: block; margin: auto;" /></p>
-</div>
 </div>
 <div id="report-network-with-group-as-variable" class="section level2">
 <h2>Report network with group as variable</h2>
 <div id="load-models-1" class="section level3">
 <h3>Load models</h3>
+<p>Individualised PT coded as 1.</p>
+<p>Advise coded as 0.</p>
 <pre class="r"><code># Model with missing data as input
 res &lt;- readRDS(&quot;output/mgm_raw.RDS&quot;)
 # Model with complete imputed data as input
-#res &lt;- readRDS(&quot;output/com.RDS&quot;)</code></pre>
+#res &lt;- readRDS(&quot;output/com.RDS&quot;)
+
+nodes &lt;- colnames (res$data[[1]])</code></pre>
 </div>
 <div id="plot-network-1" class="section level3">
 <h3>Plot network</h3>
@@ -981,8 +1004,36 @@ addtable2plot(0,0,node_df,
               display.rownames = FALSE, 
               hlines = TRUE,
               vlines = TRUE)</code></pre>
-<p><img src="figure/3-report.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/3-report.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>#dev.off()</code></pre>
+</div>
+<div id="plot-edge-weights-stability-1" class="section level3">
+<h3>Plot edge weights stability</h3>
+<div id="confidence-interval-1" class="section level4">
+<h4>Confidence interval</h4>
+<p>See which edges differ from each other in size significantly (to answer the question is edge A significantly larger than edge B).</p>
+<pre class="r"><code>w_fig &lt;- map (res$edgewts, plot, order = &quot;sample&quot;)
+
+w_fig &lt;- map (w_fig, ~.x + 
+                  theme(text = element_text(size = 16)), 
+              include = &quot;all&quot;, print = FALSE, scale = &quot;relative&quot;)
+
+cowplot::plot_grid(plotlist = w_fig, labels = c(&quot;Wk0&quot;,&quot;Wk 5&quot;, &quot;Wk 10&quot;, &quot;Wk 26&quot;, &quot;wk52&quot; ), vjust = 1, hjust = -1, ncol = 1)</code></pre>
+<p><img src="figure/3-report.Rmd/unnamed-chunk-12-1.png" width="1440" style="display: block; margin: auto;" /></p>
+</div>
+<div id="hypothesis-testing-1" class="section level4">
+<h4>Hypothesis testing</h4>
+<pre class="r"><code>wp_fig &lt;- map (res$edgewts, plot, plot = &quot;difference&quot;, 
+              satistics = &quot;edge&quot;, order = &quot;sample&quot;, onlyNonZero = TRUE)
+
+
+wp_fig &lt;- map (wp_fig, ~.x + 
+                  theme(text = element_text(size = 16)), 
+              include = &quot;all&quot;, print = FALSE, scale = &quot;relative&quot;)
+
+cowplot::plot_grid(plotlist = wp_fig, labels = c(&quot;Wk0&quot;,&quot;Wk 5&quot;, &quot;Wk 10&quot;, &quot;Wk 26&quot;, &quot;wk52&quot; ), vjust = 1, hjust = -1, ncol = 3)</code></pre>
+<p><img src="figure/3-report.Rmd/unnamed-chunk-13-1.png" width="1440" style="display: block; margin: auto;" /></p>
+</div>
 </div>
 <div id="plot-centrality-1" class="section level3">
 <h3>Plot centrality</h3>
@@ -995,13 +1046,9 @@ addtable2plot(0,0,node_df,
 <p>Expected influence is the sum of a node’s connections and represents the relative importance of a node in a network (Robinaugh et al., 2016) –relative because even in weakly connected networks (with overall low edge weights), there will always be a node with a high expected influence in case of standardized results.</p>
 <p>The greater the value of centrality indices to one, the more important the variable.</p>
 <pre class="r"><code># Plot centrality
-c_fig &lt;- map (res$nw, centralityPlot, include = &quot;all&quot;, print = FALSE, scale = &quot;relative&quot;)</code></pre>
-<pre><code>Note: relative centrality indices are shown on x-axis rather than raw centrality indices.
-Note: relative centrality indices are shown on x-axis rather than raw centrality indices.
-Note: relative centrality indices are shown on x-axis rather than raw centrality indices.
-Note: relative centrality indices are shown on x-axis rather than raw centrality indices.
-Note: relative centrality indices are shown on x-axis rather than raw centrality indices.</code></pre>
-<pre class="r"><code>c_fig &lt;- map (c_fig, ~.x + 
+c_fig &lt;- map (res$nw, centralityPlot, include = &quot;all&quot;, 
+              print = FALSE, scale = &quot;relative&quot;, labels = nodes) %&gt;%
+  map (~.x + 
                   scale_x_continuous(breaks= c(0, 0.5, 1), lim = c(0, 1)) + 
                   theme(text = element_text(size = 20), 
                         axis.text.x = element_text(angle = 90, hjust = 1)), 
@@ -1009,26 +1056,16 @@ Note: relative centrality indices are shown on x-axis rather than raw centrality
 
 #tiff(width = 15, height = 15, units = &quot;in&quot;, res = 100, file = &quot;output/odi_strength.tiff&quot;)
 cowplot::plot_grid(plotlist = c_fig, labels = c(&quot;Wk0&quot;,&quot;Wk 5&quot;, &quot;Wk 10&quot;, &quot;Wk 26&quot;, &quot;wk52&quot; ), vjust = 1, hjust = 0, ncol = 2)</code></pre>
-<pre><code>Warning: Removed 1 rows containing missing values (geom_point).
-
-Warning: Removed 1 rows containing missing values (geom_point).
-
-Warning: Removed 1 rows containing missing values (geom_point).
-
-Warning: Removed 1 rows containing missing values (geom_point).
-
-Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
-<p><img src="figure/3-report.Rmd/unnamed-chunk-11-1.png" width="1440" style="display: block; margin: auto;" /></p>
+<p><img src="figure/3-report.Rmd/unnamed-chunk-14-1.png" width="1440" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>#dev.off()</code></pre>
 </div>
 <div id="plot-centrality-stability-1" class="section level3">
 <h3>Plot centrality stability</h3>
 <p>Is the centrality order stable?</p>
 <pre class="r"><code># Plot centrality stability
-s_fig &lt;- map (res$centr_stb, plot, statistics = c(&quot;closeness&quot;, &quot;strength&quot;, &quot;betweenness&quot;))</code></pre>
-<pre><code>Warning in plot.bootnet(.x[[i]], ...): Statistic closeness does not contain any
-variance and is therefore not shown.</code></pre>
-<pre class="r"><code>s_fig &lt;- map (s_fig, ~.x + 
+s_fig &lt;- map (res$centr_stb, plot, statistics = c(&quot;closeness&quot;, &quot;strength&quot;, &quot;betweenness&quot;))
+
+s_fig &lt;- map (s_fig, ~.x + 
                 ylab (&quot;Ave Corr&quot;) + 
                   theme(text = element_text(size = 20), 
                         axis.text.x = element_text(angle = 90, hjust = 1)), 
@@ -1037,7 +1074,7 @@ variance and is therefore not shown.</code></pre>
 
 #tiff(width = 15, height = 15, units = &quot;in&quot;, res = 100, file = &quot;output/odi_stability.tiff&quot;)
 cowplot::plot_grid(plotlist = s_fig, labels = c(&quot;Wk0&quot;,&quot;Wk 5&quot;, &quot;Wk 10&quot;, &quot;Wk 26&quot;, &quot;wk52&quot; ), vjust = 1, hjust = -1, ncol = 2)</code></pre>
-<p><img src="figure/3-report.Rmd/unnamed-chunk-12-1.png" width="1440" style="display: block; margin: auto;" /></p>
+<p><img src="figure/3-report.Rmd/unnamed-chunk-15-1.png" width="1440" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>#dev.off()</code></pre>
 </div>
 <div id="get-cs-coefficient-1" class="section level3">
@@ -1048,10 +1085,9 @@ cowplot::plot_grid(plotlist = s_fig, labels = c(&quot;Wk0&quot;,&quot;Wk 5&quot;
   unnest () %&gt;%
   ungroup() %&gt;%
   mutate (measure = rep (c(&quot;betweenness&quot;, &quot;closeness&quot;, &quot;edge&quot;, &quot;expectedInfluence&quot;, &quot;strength&quot;), 5)) %&gt;%
-  mutate (cor_stb = round (cor_stb, 2))</code></pre>
-<pre><code>Warning: `cols` is now required when using unnest().
-Please use `cols = c(cor_stb)`</code></pre>
-<pre class="r"><code>cs_coef %&gt;%
+  mutate (cor_stb = round (cor_stb, 2))
+
+cs_coef %&gt;%
   knitr::kable (caption = &quot;Stability of centrality indices&quot;)</code></pre>
 <table>
 <caption>Stability of centrality indices</caption>
@@ -1190,18 +1226,6 @@ Please use `cols = c(cor_stb)`</code></pre>
 </tr>
 </tbody>
 </table>
-</div>
-<div id="plot-edge-weights-stability-1" class="section level3">
-<h3>Plot edge weights stability</h3>
-<p>See which edges differ from each other in size significantly (to answer the question is edge A significantly larger than edge B).</p>
-<pre class="r"><code>w_fig &lt;- map (res$edgewts, plot, order = &quot;sample&quot;)
-
-w_fig &lt;- map (w_fig, ~.x + 
-                  theme(text = element_text(size = 16)), 
-              include = &quot;all&quot;, print = FALSE, scale = &quot;relative&quot;)
-
-cowplot::plot_grid(plotlist = w_fig, labels = c(&quot;Wk0&quot;,&quot;Wk 5&quot;, &quot;Wk 10&quot;, &quot;Wk 26&quot;, &quot;wk52&quot; ), vjust = 1, hjust = -1, ncol = 1)</code></pre>
-<p><img src="figure/3-report.Rmd/unnamed-chunk-14-1.png" width="1440" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
