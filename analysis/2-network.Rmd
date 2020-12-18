@@ -205,7 +205,9 @@ dat <- df$odi_mgm
 set.seed(1)
 
 res_mgm_raw <- dat %>%
-  select (time, data) %>%
+  select (time, data) %>% 
+  # remove cases with missing columns
+  mutate (data = map (data, na.omit)) %>%
   # Transform data
   mutate (data = map(data, my_huge)) %>%
   # Estimate network
@@ -225,32 +227,16 @@ res_mgm_raw <- dat %>%
   mutate (centr = map (nw, centralityTable)) 
 
 
-# Furrr throws up error with mgm, switched to doParallel
 # Bootstrap by case to get stability of centrality
-doParallel::registerDoParallel(4)
 B <- 2000
+plan (multisession)
 
-centr_stb_list <- list()
-
-centr_stb_list <-  foreach (n = 1: nrow (dat)) %dopar% {
-  bootnet::bootnet (res_mgm_raw$data[[n]],
-                     default = "mgm",
-                     .type= c("c", rep("g", 10)),
-                     level= c(2, rep(1, 10)),
-                     criterion  = "CV",          
-                     nFolds = 10,            
-                     order = 2,                       
-                     binarySign = TRUE,
-                     scale = TRUE,
-                    .pbar = FALSE,
-                    .signInfo = FALSE,
-                    nBoots = B,
-                    type = "case",
-                    statistics = stats_type)
-  
-}
-
-res_mgm_raw$centr_stb <- centr_stb_list
+res_mgm_raw <- res_mgm_raw %>%
+  mutate (centr_stb = future_map (nw, 
+                                  bootnet, 
+                                  nBoots = B,
+                                  type = "case",
+                                  statistics = stats_type))
 
 # Stability measure
 res_mgm_raw <- res_mgm_raw %>%
@@ -258,25 +244,13 @@ res_mgm_raw <- res_mgm_raw %>%
                          corStability))
 
 # Bootstrap by case to get stability of centrality
-edgewts_list <- list()
+plan (multisession)
 
-edgewts_list <-  foreach (n = 1: nrow (dat)) %dopar% {
-  bootnet::bootnet (res_mgm_raw$nw[[n]],
-                    default = "mgm",
-                     .type= c("c", rep("g", 10)),
-                     level= c(2, rep(1, 10)),
-                     criterion  = "CV",          
-                     nFolds = 10,            
-                     order = 2,                       
-                     binarySign = TRUE,
-                     scale = TRUE,
-                    .pbar = FALSE,
-                    .signInfo = FALSE,
-                    nBoots = B)
-  
-}
+res_mgm_raw <- res_mgm_raw %>%
+  mutate (edgewts = future_map (nw, 
+                                  bootnet, 
+                                  nBoots = B))
 
-res_mgm_raw$edgewts <- edgewts_list
 
 saveRDS(res_mgm_raw, "output/mgm_raw.RDS")
 
@@ -311,59 +285,30 @@ res_mgm_com <- dat %>%
   mutate (centr = map (nw, centralityTable)) 
 
 
-# Furrr throws up error with mgm, switched to doParallel
 # Bootstrap by case to get stability of centrality
-doParallel::registerDoParallel(4)
 B <- 2000
+plan (multisession)
 
-centr_stb_list <- list()
-
-centr_stb_list <-  foreach (n = 1: nrow (dat)) %dopar% {
-  bootnet::bootnet (res_mgm_com$data[[n]],
-                     default = "mgm",
-                     .type= c("c", rep("g", 10)),
-                     level= c(2, rep(1, 10)),
-                     criterion  = "CV",          
-                     nFolds = 10,            
-                     order = 2,                       
-                     binarySign = TRUE,
-                     scale = TRUE,
-                    .pbar = FALSE,
-                    .signInfo = FALSE,
-                    nBoots = B,
-                    type = "case",
-                    statistics = stats_type)
-  
-}
-
-res_mgm_com$centr_stb <- centr_stb_list
+res_mgm_raw <- res_mgm_raw %>%
+  mutate (centr_stb = future_map (nw, 
+                                  bootnet, 
+                                  nBoots = B,
+                                  type = "case",
+                                  statistics = stats_type))
 
 # Stability measure
-res_mgm_com <- res_mgm_com %>%
+res_mgm_raw <- res_mgm_raw %>%
   mutate (cor_stb = map (centr_stb,
                          corStability))
 
 # Bootstrap by case to get stability of centrality
-doParallel::registerDoParallel(4)
-edgewts_list <- list()
+plan (multisession)
 
-edgewts_list <-  foreach (n = 1: nrow (dat)) %dopar% {
-  bootnet::bootnet (res_mgm_com$nw[[n]],
-                    default = "mgm",
-                     .type= c("c", rep("g", 10)),
-                     level= c(2, rep(1, 10)),
-                     criterion  = "CV",          
-                     nFolds = 10,            
-                     order = 2,                       
-                     binarySign = TRUE,
-                     scale = TRUE,
-                    .pbar = FALSE,
-                    .signInfo = FALSE,
-                    nBoots = B)
-  
-}
+res_mgm_raw <- res_mgm_raw %>%
+  mutate (edgewts = future_map (nw, 
+                                  bootnet, 
+                                  nBoots = B))
 
-res_mgm_com$edgewts <- edgewts_list
 
 saveRDS(res_mgm_com, "output/mgm_com.RDS")
 
