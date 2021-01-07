@@ -73,7 +73,7 @@ stats_type <- c("edge", "strength", "betweenness", "expectedInfluence", "closene
 
 my_huge <- function (df) {
 
-  df[, grepl ("Q", names(df))] <- huge.npn (df[, grepl ("Q", names(df))] )
+  df[, grepl ("Q", names(df))] <- huge::huge.npn (df[, grepl ("Q", names(df))] )
 
   return (df)
 
@@ -81,120 +81,6 @@ my_huge <- function (df) {
 
 ```
 
-### Analyse without groups as variable
-
-#### Analyse data with missing
-
-```{r}
-dat <- df$odi 
-
-plan (multisession)
-set.seed(1)
-
-res_raw <- dat %>%
-  select (time, data) %>%
-  # Transform data
-  mutate (data = map(data, huge.npn)) %>%
-  # Estimate network
-  mutate (nw = map (data,
-                    estimateNetwork,
-                    default="EBICglasso",
-                    corMethod = "cor",
-                    tuning = 0.5,
-                    lambda.min.ratio = 0.001,
-                    corArgs =
-                      list(method = "pearson",
-                           use = "pairwise.complete.obs")),
-          # Get centrality measures
-          centr = map (nw, centralityTable),
-          # Bootstrap by case to get stability of centrality
-          centr_stb = future_map (nw,
-                                  bootnet,
-                                  default="EBICglasso",
-                                  corMethod = "cor",
-                                  tuning = 0.5,
-                                  lambda.min.ratio = 0.001,
-                                  nBoots = B,
-                                  type = "case",
-                                  statistics = stats_type,
-                                  corArgs =
-                                    list(method = "pearson",
-                                         use = "pairwise.complete.obs")),
-          # Stability measure
-          cor_stb = map (centr_stb,
-                         corStability),
-          # Bootstrap to get edgeweights stability
-          edgewts = future_map (nw,
-                                bootnet,
-                                default="EBICglasso",
-                                corMethod = "cor",
-                                tuning = 0.5,
-                                lambda.min.ratio = 0.001,
-                                nBoots = B,
-                                corArgs =
-                                  list(method = "pearson",
-                                       use = "pairwise.complete.obs")))
-
-saveRDS(res_raw, "output/raw.RDS")
-
-
-```
-
-
-#### Analyse data with complete
-
-```{r}
-plan (multisession)
-set.seed(1)
-
-res_com <- dat %>%
-  select (time, data_com) %>%
-  rename (data = data_com) %>%
-  # Transform data
-  mutate (data = map(data, huge.npn)) %>%
-  # Estimate network
-  mutate (nw = map (data,
-                    estimateNetwork,
-                    default="EBICglasso",
-                    corMethod = "cor",
-                    tuning = 0.5,
-                    lambda.min.ratio = 0.001,
-                    corArgs =
-                      list(method = "pearson",
-                           use = "pairwise.complete.obs")),
-          # Get centrality measures
-          centr = map (nw, centralityTable),
-          # Bootstrap by case to get stability of centrality
-          centr_stb = future_map (nw,
-                                  bootnet,
-                                  default="EBICglasso",
-                                  corMethod = "cor",
-                                  tuning = 0.5,
-                                  lambda.min.ratio = 0.001,
-                                  nBoots = B,
-                                  type = "case",
-                                  statistics = stats_type,
-                                  corArgs =
-                                    list(method = "pearson",
-                                         use = "pairwise.complete.obs")),
-          # Stability measure
-          cor_stb = map (centr_stb,
-                         corStability),
-          # Bootstrap to get edgeweights stability
-          edgewts = future_map (nw,
-                                bootnet,
-                                default="EBICglasso",
-                                corMethod = "cor",
-                                tuning = 0.5,
-                                lambda.min.ratio = 0.001,
-                                nBoots = B,
-                                corArgs =
-                                  list(method = "pearson",
-                                       use = "pairwise.complete.obs")))
-
-saveRDS(res_com, "output/com.RDS")
-
-```
 
 ### Analyse with groups as variable
 
@@ -236,7 +122,8 @@ res_mgm_raw <- res_mgm_raw %>%
                                   bootnet, 
                                   nBoots = B,
                                   type = "case",
-                                  statistics = stats_type))
+                                  statistics = stats_type,
+                                  .options = furrr_options(seed = TRUE)))
 
 # Stability measure
 res_mgm_raw <- res_mgm_raw %>%
@@ -249,7 +136,8 @@ plan (multisession)
 res_mgm_raw <- res_mgm_raw %>%
   mutate (edgewts = future_map (nw, 
                                   bootnet, 
-                                  nBoots = B))
+                                  nBoots = B,
+                                .options = furrr_options(seed = TRUE)))
 
 
 saveRDS(res_mgm_raw, "output/mgm_raw.RDS")
@@ -294,7 +182,8 @@ res_mgm_raw <- res_mgm_raw %>%
                                   bootnet, 
                                   nBoots = B,
                                   type = "case",
-                                  statistics = stats_type))
+                                  statistics = stats_type,
+                                  .options = furrr_options(seed = TRUE)))
 
 # Stability measure
 res_mgm_raw <- res_mgm_raw %>%
@@ -307,8 +196,8 @@ plan (multisession)
 res_mgm_raw <- res_mgm_raw %>%
   mutate (edgewts = future_map (nw, 
                                   bootnet, 
-                                  nBoots = B))
-
+                                  nBoots = B,
+                                .options = furrr_options(seed = TRUE)))
 
 saveRDS(res_mgm_com, "output/mgm_com.RDS")
 
