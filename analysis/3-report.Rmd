@@ -39,148 +39,6 @@ node_df <- data.frame("Item" = ques,
 ```
 
 
-### Load models
-
-```{r}
-# Model with missing data as input
-res <- readRDS("output/raw.RDS")
-# Model with complete imputed data as input
-#res <- readRDS("output/com.RDS")
-```
-
-### Plot network
-
-Blue edges - positive correlation
-
-Red edges - negative correlation
-
-The thickness of the edges indicate the magnitude of correlation.
-
-```{r}
-
-#tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_network.tiff")
-par (mfrow = c(2,3))
-p1 <- plot (res$nw[[1]], title = "Baseline", label.cex = 1.5, vsize = 10)
-plot (res$nw[[2]], title = "Week 5", layout = p1$layout, label.cex = 1.5, vsize = 10)
-plot (res$nw[[3]], title = "Week 10", layout = p1$layout, label.cex = 1.5, vsize = 10)
-plot (res$nw[[4]], title = "Week 26", layout = p1$layout, label.cex = 1.5, vsize = 10)
-plot (res$nw[[5]], title = "Week 52", layout = p1$layout, label.cex = 1.5, vsize = 10)
-plot.new()
-addtable2plot(0,0,node_df, 
-              xpad=1, ypad=1,
-              bty='o',
-              display.rownames = FALSE, 
-              hlines = TRUE,
-              vlines = TRUE)
-#dev.off()
-
-```
-
-### Plot edge weights stability
-
-#### Confidence interval
-
-See which edges differ from each other in size significantly (to answer the question is edge A significantly larger than edge B).
-
-```{r fig.height=40, fig.width=15, message=FALSE, warning=FALSE}
-w_fig <- map (res$edgewts, plot, order = "sample")
-
-w_fig <- map (w_fig, ~.x + 
-                  theme(text = element_text(size = 16)), 
-              include = "all", print = FALSE, scale = "relative")
-
-cowplot::plot_grid(plotlist = w_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = -1, ncol = 1)
-
-```
-
-#### Hypothesis testing
-
-```{r fig.height=15, fig.width=15, message=FALSE, warning=FALSE}
-wp_fig <- map (res$edgewts, plot, plot = "difference", 
-              satistics = "edge", order = "sample", onlyNonZero = TRUE)
-
-
-wp_fig <- map (wp_fig, ~.x + 
-                  theme(text = element_text(size = 16)), 
-              include = "all", print = FALSE, scale = "relative")
-
-cowplot::plot_grid(plotlist = wp_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = -1, ncol = 3)
-
-```
-
-### Plot centrality
-
-High centrality nodes have strong connections to many other nodes, and act as hubs that connect otherwise disparate nodes to one another. 
-
-Low centrality nodes exist on the periphery of the network, with fewer and weaker connections to other nodes of the
-network.
-
-Strength is the sum of the absolute value of its connections with other nodes in the network.
-
-Degree can be straightforwardly generalized to weighted networks by considering the sum of the weights of the connections (in absolute value), instead of their number. This generalization is called strength.
-
-Closeness centrality is defined as the inverse of the sum of the distances of the focal node from all the other nodes in the network. Closeness is the average shortest path between a given node and the remaining nodes in the network. Nodes with higher closeness are more proximally connected to the rest of the network.
-
-Betweenness is the number of times in which a given node lies on the shortest path between two other nodes.
-
-Expected influence is the sum of a node’s connections and represents the relative importance of a node in a network (Robinaugh et al., 2016) --relative because even in weakly connected networks (with overall low edge weights), there will always be a node with a high expected influence in case of standardized results.
-
-The greater the value of centrality indices to one, the more important the variable.
-
-```{r fig.height=20, fig.width=15, message=FALSE, warning=FALSE}
-# Plot centrality
-c_fig <- map (res$nw, centralityPlot, include = "all", print = FALSE, scale = "relative")
-
-c_fig <- map (c_fig, ~.x + 
-                  scale_x_continuous(breaks= c(0, 0.5, 1), lim = c(0, 1)) + 
-                  theme(text = element_text(size = 20), 
-                        axis.text.x = element_text(angle = 90, hjust = 1)), 
-              include = "all", print = FALSE, scale = "relative")
-#tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_strength.tiff")
-cowplot::plot_grid(plotlist = c_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = 0, ncol = 2)
-#dev.off()
-
-```
-
-### Plot centrality stability
-
-Is the centrality order stable?
-
-```{r fig.height=20, fig.width=15, message=FALSE, warning=FALSE}
-# Plot centrality stability
-s_fig <- map (res$centr_stb, plot, statistics = c("closeness", "strength", "betweenness"))
-
-s_fig <- map (s_fig, ~.x + 
-                ylab ("Ave Corr") + 
-                  theme(text = element_text(size = 20), 
-                        axis.text.x = element_text(angle = 90, hjust = 1)), 
-              include = "all", print = FALSE, scale = "relative")
-
-#tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_stability.tiff")
-cowplot::plot_grid(plotlist = s_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = -1, ncol = 2)
-#dev.off()
-
-```
-
-### Get CS coefficient
-
-The stability of centrality estimation, and results in a centrality-stability coefficient (CS-coefficient) that should not be lower than 0.25 and preferably above 0.5
-
-
-```{r, results = "asis", message=FALSE, warning=FALSE}
-cs_coef <- res %>%
-  select (time, cor_stb) %>%
-  unnest () %>%
-  ungroup() %>%
-  mutate (measure = rep (c("betweenness", "closeness", "edge", "expectedInfluence", "strength"), 5)) %>%
-  mutate (cor_stb = round (cor_stb, 2))
-
-cs_coef %>%
-  knitr::kable (caption = "Stability of centrality indices")
-
-```
-
-
 ## Report network with group as variable
 
 ### Load models
@@ -241,6 +99,42 @@ addtable2plot(0,0,node_df,
               hlines = TRUE,
               vlines = TRUE)
 dev.off()
+
+```
+
+
+```{r, include = FALSE, eval = FALSE}
+# Easy reporting in manuscript
+n = 5
+
+x <- summary (res$edgewts[[n]]) %>%
+  ungroup () %>%
+  filter (type == "edge" & sample != 0) %>%
+  dplyr::select (id, node1, node2, sample, q2.5, q97.5) %>%
+  mutate (samp_abs = abs (sample)) %>%
+  group_by(node1) %>%
+  slice_max (samp_abs, n = 4) %>%
+  map_if (is.numeric, round, 2) %>%
+  bind_cols()
+
+x_max <- x %>%
+  slice_max (sample, n = 1)
+
+nod2 <- x[x$node1 == "grp", ][["node2"]]
+
+for (i in seq_along (nod2)) {
+  cat ("Group was related to", x[x$node1 == "grp" & x$node2 == nod2[i], ][["node2"]],
+     "with a value of", x[x$node1 == "grp" & x$node2 == nod2[i], ][["sample"]],
+     "(95%CI [", x[x$node1 == "grp" & x$node2 == nod2[i],][["q2.5"]], "to", 
+     x[x$node1 == "grp" & x$node2 == nod2[i], ][["q97.5"]], "])", "\n")
+}
+
+
+cat ("The edge with the greatest weight magnitude was between", x_max[["node1"]],
+     "and",   x_max[["node2"]],
+     "with a value of", x_max[["sample"]],
+     "([95%CI (", x_max[["q2.5"]], "to", x_max[["q97.5"]], "])")
+
 
 ```
 
@@ -332,7 +226,7 @@ c_fig <- map (res$nw, centralityPlot, include = c("Closeness", "Strength", "Betw
   map (~.x + 
                   scale_x_continuous(breaks= c(0, 0.5, 1), lim = c(0, 1)) + 
                   theme(text = element_text(size = 20), 
-                        axis.text.x = element_text(angle = 90, hjust = 1)), 
+                        axis.text.x = element_text(angle = 45, hjust = 1)), 
               include = "all", print = FALSE, scale = "relative")
 
 #tiff(width = 15, height = 15, units = "in", res = 100, file = "output/odi_strength.tiff")
@@ -341,13 +235,13 @@ cowplot::plot_grid(plotlist = c_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", 
 
 ```
 
-```{r eval = FALSE}
+```{r eval = FALSE, include = FALSE}
 c_fig <- map (res$nw, centralityPlot, include = c("Closeness", "Strength", "Betweenness"), 
               print = FALSE, scale = "relative", labels = nodes) %>%
   map (~.x + 
                   scale_x_continuous(breaks= c(0, 0.5, 1), lim = c(0, 1)) + 
                   theme(text = element_text(size = 20), 
-                        axis.text.x = element_text(angle = 90, hjust = 1)), 
+                        axis.text.x = element_text(angle = 45, hjust = 1)), 
               include = "all", print = FALSE, scale = "relative")
 
 pdf(width = 20, height = 15, file = "../manuscript_odi_nw/fig3.pdf")
@@ -358,23 +252,25 @@ dev.off()
 
 ```
 
-```{r}
+```{r, eval = FALSE, include = FALSE}
 
-n_time <- 5
-c_val <- c_fig[[n_time]]$data %>%
-  group_by(measure) %>%
-  slice_max (value)
+n_time <- c("baseline", "week 5", "week 10", "week 26", "week 52")
 
-max_str_node <- c_val[c_val$measure == "Strength", "node", drop = TRUE] %>% as.character()
-max_str_val <- c_val[c_val$measure == "Strength", "value", drop = TRUE] %>% as.character()
-max_close_node <- c_val[c_val$measure == "Closeness", "node", drop = TRUE] %>% as.character()
-max_close_val <- c_val[c_val$measure == "Closeness", "value", drop = TRUE] %>% as.character()
-max_btw_node <- c_val[c_val$measure == "Betweenness", "node", drop = TRUE] %>% as.character()
-max_btw_val <- c_val[c_val$measure == "Betweenness", "value", drop = TRUE] %>% as.character()
+for (n in seq_along (n_time)) {
+  
+  c_val <- c_fig[[n]]$data %>%
+    group_by(node) %>%
+    mutate (ave = mean (value)) %>%
+    ungroup () %>%
+    slice_max (ave, n = 6) %>%
+    pull (node) %>%
+    unique () %>%
+    as.character()
+  
+  cat ("At", n_time[n], "across all three centrality measures, the two nodes with the greatest value was",     c_val[[1]], "and", c_val[[2]], "\n")
 
-paste0("The node with the greatest Closeness measure is ", max_close_node, " with a value of ", max_close_val)
-paste0("The node with the greatest Strength measure is ", max_str_node, " with a value of ", max_str_val)
-paste0("The node with the greatest Betweenness measure is ", max_btw_node, " with a value of ", max_btw_val)
+}
+
 
 ```
 
@@ -400,7 +296,7 @@ cowplot::plot_grid(plotlist = s_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", 
 
 ```
 
-```{r eval = FALSE}
+```{r eval = FALSE, include = FALSE}
 # Plot centrality stability
 s_fig <- map (res$centr_stb, plot, statistics = c("closeness", "strength", "betweenness"))
 
@@ -437,7 +333,14 @@ cs_coef %>%
 
 ```
 
-```{r, eval = FALSE}
+```{r, eval = FALSE, include = FALSE}
+cs_coef %>%
+    group_by(time) %>%
+    slice_max (CS, n = 1)
+  
+```
+
+```{r eval = FALSE, include = FALSE}
 my_path <- paste0("../manuscript_odi_nw/table_", 
                   "CScoef",
                   ".docx")
