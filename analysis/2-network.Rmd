@@ -177,7 +177,7 @@ res_mgm_com <- dat %>%
 B <- 2000
 plan (multisession)
 
-res_mgm_raw <- res_mgm_raw %>%
+res_mgm_com  <- res_mgm_com  %>%
   mutate (centr_stb = future_map (nw, 
                                   bootnet, 
                                   nBoots = B,
@@ -186,14 +186,14 @@ res_mgm_raw <- res_mgm_raw %>%
                                   .options = furrr_options(seed = TRUE)))
 
 # Stability measure
-res_mgm_raw <- res_mgm_raw %>%
+res_mgm_com <- res_mgm_com  %>%
   mutate (cor_stb = map (centr_stb,
                          corStability))
 
 # Bootstrap by case to get stability of centrality
 plan (multisession)
 
-res_mgm_raw <- res_mgm_raw %>%
+res_mgm_com  <- res_mgm_com %>%
   mutate (edgewts = future_map (nw, 
                                   bootnet, 
                                   nBoots = B,
