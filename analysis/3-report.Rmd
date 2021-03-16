@@ -21,7 +21,20 @@ pacman::p_load(tidyverse,
                furrr,
                cowplot,
                officer,
-               flextable)
+               flextable,
+               arsenal)
+
+# Helper code
+
+meanNsd_transform <- function (x) {
+
+  m <- round (x[[1]][1], 2)
+  s <- round (x[[1]][2], 2)
+
+  m_s <- paste0(m, "(", s, ")")
+
+  return (m_s)
+}
 ```
 
 ## Report network without group as variable
@@ -32,6 +45,10 @@ pacman::p_load(tidyverse,
 # ODI custom figure
 nodeLabels <- c("Pain Intensity", "Personal Care", "Lifting", "Walking", "Sitting",
                 "Standing", "Sleeping", "Social life", "Travelling", "Work/Housework")
+
+nodeLabs <- c("Grp", "Q1.Pain", "Q2.Care", "Q3.Lift", "Q4.Walk", "Q5.Sit",
+                "Q6.Std", "Q7.Slp", "Q8.Life", "Q9.Trav", "Q10.Work")
+
 ques <- paste0("Q", 1:10)
 
 node_df <- data.frame("Item" = ques,
@@ -56,6 +73,61 @@ res <- readRDS("output/mgm_raw.RDS")
 nodes <- colnames (res$data[[1]])
 ```
 
+## Descriptive statistics 
+
+```{r}
+df <- readRDS("output/dat_odi_nest.RDS")
+
+temp1 <- df$raw %>% select (-data_mgm)
+temp2 <- df$com %>% select (-data_mgm) %>% rename (data_com = data)
+temp3 <- temp1 %>%
+  inner_join(temp2, by = "time")
+
+temp4 <- df$raw %>% select (-data) %>% rename (data = data_mgm)
+temp5 <- df$com %>% select (-data) %>% rename (data_com = data_mgm)
+temp6 <- temp4 %>%
+  inner_join(temp5, by = "time")
+
+df <- list (odi = temp3, 
+            odi_mgm = temp6)
+
+rm (list = ls(pattern = "temp"))
+
+df2 <- df$odi_mgm %>%
+  select (time, data) %>%
+  unnest (data) %>%
+  mutate_if (is.factor, as.numeric) %>%
+  mutate (grp = factor (grp),
+          time = factor (time)) %>%
+  pivot_longer(cols = starts_with("Q"),
+               names_to = "Items",
+               values_to = "val") %>%
+  mutate (Items = factor (Items, levels = ques, labels = nodeLabels))
+
+df_plot <- df2 %>%
+  group_by(time, grp,Items) %>%
+  summarise(Mean = mean (val, na.rm = TRUE),
+            Sd = sd (val, na.rm = TRUE))
+
+ f <- ggplot (df_plot) +
+  geom_point(aes (x = Items, y = Mean, colour = grp, group = grp),  
+             stat = "identity", position=position_dodge(0.5)) +
+  geom_errorbar(aes (x = Items, ymin = Mean - Sd, 
+                     ymax = Mean + Sd, colour = grp), width = 0, position=position_dodge(0.5)) +
+  facet_wrap(~ time, scales = "fixed") +
+  scale_color_manual(values = c("red", "blue"), labels = c("IndPT", "Advice")) +  
+  labs (x = "ODI Items",
+        y = "Mean (SD) score of items",
+        colour = "Group") +
+  theme_cowplot() + 
+  theme(text = element_text(size=16),
+        axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) 
+
+pdf(width = 15, height = 8, file = "../manuscript_odi_nw/sm_fig1.pdf")
+f
+dev.off()
+```
+
 ### Plot network
 
 Blue edges - positive correlation
@@ -67,37 +139,36 @@ The thickness of the edges indicate the magnitude of correlation.
 ```{r}
 
 par (mfrow = c(2,3))
-p1 <- plot (res$nw[[1]], title = "Baseline", label.cex = 1.5, vsize = 10, curve = 0.4, curveAll = TRUE)
-plot (res$nw[[2]], title = "Week 5", layout = p1$layout, label.cex = 1.5, vsize = 10, curve = 0.4, curveAll = TRUE)
-plot (res$nw[[3]], title = "Week 10", layout = p1$layout, label.cex = 1.5, vsize = 10, curve = 0.4, curveAll = TRUE)
-plot (res$nw[[4]], title = "Week 26", layout = p1$layout, label.cex = 1.5, vsize = 10, curve = 0.4, curveAll = TRUE)
-plot (res$nw[[5]], title = "Week 52", layout = p1$layout, label.cex = 1.5, vsize = 10, curve = 0.4, curveAll = TRUE)
-plot.new()
-addtable2plot(0,0,node_df, 
-              xpad=1, ypad=1,
-              bty='o',
-              display.rownames = FALSE, 
-              hlines = TRUE,
-              vlines = TRUE)
+p1 <- plot (res$nw[[1]], title = "Baseline", label.cex = 2, vsize = 15, curve = 0.4, curveAll = TRUE, labels = nodeLabs)
+plot (res$nw[[2]], title = "Week 5", layout = p1$layout, label.cex = 2, vsize = 15, curve = 0.4, curveAll = TRUE, labels = nodeLabs)
+plot (res$nw[[3]], title = "Week 10", layout = p1$layout, label.cex = 2, vsize = 15, curve = 0.4, curveAll = TRUE, labels = nodeLabs)
+plot (res$nw[[4]], title = "Week 26", layout = p1$layout, label.cex = 2, vsize = 15, curve = 0.4, curveAll = TRUE, labels = nodeLabs)
+plot (res$nw[[5]], title = "Week 52", layout = p1$layout, label.cex = 2, vsize = 15, curve = 0.4, curveAll = TRUE, labels = nodeLabs)
+# plot.new()
+# addtable2plot(0,0,node_df, 
+#               xpad=1, ypad=1,
+#               bty='o',
+#               display.rownames = FALSE, 
+#               hlines = TRUE,
+#               vlines = TRUE)
 
 ```
 
 ```{r, eval = FALSE}
-pdf(width = 25, height = 15, file = "../manuscript_odi_nw/fig1.pdf")
+pdf(width = 30, height = 20, file = "../manuscript_odi_nw/fig1.pdf")
 par (mfrow = c(2,3))
-p1 <- plot (res$nw[[1]], title = "Baseline", label.cex = 1.5, vsize = 10, title.cex = 2, curve = 0.4, curveAll = TRUE)
-plot (res$nw[[2]], title = "Week 5", layout = p1$layout, label.cex = 1.5, vsize = 10, title.cex = 2, curve = 0.4, curveAll = TRUE)
-plot (res$nw[[3]], title = "Week 10", layout = p1$layout, label.cex = 1.5, vsize = 10, title.cex = 2, curve = 0.4, curveAll = TRUE)
-plot (res$nw[[4]], title = "Week 26", layout = p1$layout, label.cex = 1.5, vsize = 10, title.cex = 2, curve = 0.4, curveAll = TRUE)
-plot (res$nw[[5]], title = "Week 52", layout = p1$layout, label.cex = 1.5, vsize = 10, title.cex = 2, curve = 0.4, curveAll = TRUE)
-plot.new()
-addtable2plot(0,0,node_df, 
-              xpad=1, ypad=1,
-              bty='o',
-              cex = 3,
-              display.rownames = FALSE, 
-              hlines = TRUE,
-              vlines = TRUE)
+p1 <- plot (res$nw[[1]], title = "Baseline", label.cex = 1, vsize = 15, curve = 0.4, curveAll = TRUE, labels = nodeLabs, title.cex = 4)
+plot (res$nw[[2]], title = "Week 5", layout = p1$layout, label.cex = 1, vsize = 15, curve = 0.4, curveAll = TRUE, labels = nodeLabs, title.cex = 4)
+plot (res$nw[[3]], title = "Week 10", layout = p1$layout, label.cex = 1, vsize = 15, curve = 0.4, curveAll = TRUE, labels = nodeLabs, title.cex = 4)
+plot (res$nw[[4]], title = "Week 26", layout = p1$layout, label.cex = 1, vsize = 15, curve = 0.4, curveAll = TRUE, labels = nodeLabs, title.cex = 4)
+plot (res$nw[[5]], title = "Week 52", layout = p1$layout, label.cex = 1, vsize = 15, curve = 0.4, curveAll = TRUE, labels = nodeLabs, title.cex = 4)
+# plot.new()
+# addtable2plot(0,0,node_df, 
+#               xpad=1, ypad=1,
+#               bty='o',
+#               display.rownames = FALSE, 
+#               hlines = TRUE,
+#               vlines = TRUE)
 dev.off()
 
 ```
@@ -144,9 +215,10 @@ cat ("The edge with the greatest weight magnitude was between", x_max[["node1"]]
 See which edges differ from each other in size significantly (to answer the question is edge A significantly larger than edge B).
 
 ```{r fig.height=40, fig.width=15, message=FALSE, warning=FALSE}
-w_fig <- map (res$edgewts, plot, order = "sample", CIstyle = "SE")
+w_fig <- map (res$edgewts, plot, order = "sample", CIstyle = "quantiles")
 
 w_fig <- map (w_fig, ~.x + 
+                scale_y_binned(labels = nodeLabs) + 
                   theme(text = element_text(size = 16)), 
               include = "all", print = FALSE, scale = "relative")
 
@@ -157,10 +229,10 @@ cowplot::plot_grid(plotlist = w_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", 
 ```
 
 ```{r, eval = FALSE}
-w_fig <- map (res$edgewts, plot, order = "sample", CIstyle = "SE")
+w_fig <- map (res$edgewts, plot, order = "sample", CIstyle = "quantiles")
 
 w_fig <- map (w_fig, ~.x + 
-                  theme(text = element_text(size = 14)), 
+                  theme(text = element_text(size = 12)), 
               include = "all", print = FALSE, scale = "relative")
 
 pdf(width = 16, height = 25, file = "../manuscript_odi_nw/fig2.pdf")
@@ -222,7 +294,7 @@ The greater the value of centrality indices to one, the more important the varia
 ```{r fig.height=20, fig.width=15, message=FALSE, warning=FALSE}
 # Plot centrality
 c_fig <- map (res$nw, centralityPlot, include = c("Closeness", "Strength", "Betweenness"),  
-              print = FALSE, scale = "relative", labels = nodes) %>%
+              print = FALSE, scale = "relative", labels = nodeLabs) %>%
   map (~.x + 
                   scale_x_continuous(breaks= c(0, 0.5, 1), lim = c(0, 1)) + 
                   theme(text = element_text(size = 20), 
@@ -237,7 +309,7 @@ cowplot::plot_grid(plotlist = c_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", 
 
 ```{r eval = FALSE, include = FALSE}
 c_fig <- map (res$nw, centralityPlot, include = c("Closeness", "Strength", "Betweenness"), 
-              print = FALSE, scale = "relative", labels = nodes) %>%
+              print = FALSE, scale = "relative", labels = nodeLabs) %>%
   map (~.x + 
                   scale_x_continuous(breaks= c(0, 0.5, 1), lim = c(0, 1)) + 
                   theme(text = element_text(size = 20), 
