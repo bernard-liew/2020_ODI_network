@@ -84,9 +84,9 @@ my_huge <- function (df) {
 
 ### Analyse with groups as variable
 
-#### Analyse data with missing
 
 ```{r}
+#### Analyse data with missing
 dat <- df$odi_mgm 
 set.seed(1)
 
@@ -145,10 +145,10 @@ saveRDS(res_mgm_raw, "output/mgm_raw.RDS")
 ```
 
 
+
+
+```{r, eval = FALSE, include = FALSE}
 #### Analyse data with complete
-
-```{r}
-
 set.seed(1)
 
 res_mgm_com <- dat %>%

@@ -15,6 +15,7 @@
 
 <title>2-network</title>
 
+<script src="site_libs/header-attrs-2.6/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -35,6 +36,17 @@ div.section {
   padding-top: 12px;
 }
 </style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -80,6 +92,7 @@ h6 {
   text-align: left;
 }
 </style>
+
 
 
 
@@ -387,7 +400,7 @@ div.tocify {
 
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
-<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span>
 </button>
 </p>
 <div id="workflowr-report" class="collapse">
@@ -396,7 +409,7 @@ div.tocify {
 <a data-toggle="tab" href="#summary">Summary</a>
 </li>
 <li>
-<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -405,10 +418,10 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-11-04
+<strong>Last updated:</strong> 2021-04-14
 </p>
 <p>
-<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
 </p>
 <p>
 <strong>Knit directory:</strong> <code>2020_ODI_network/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
@@ -424,12 +437,12 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted changes </a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+<p>The R Markdown file has unstaged changes. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
 </div>
 </div>
 </div>
@@ -496,24 +509,26 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombernardliew2020ODInetworktree502ad53119a12ff05a62d309e07ab480d18ae6bctargetblank502ad53a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/bernard-liew/2020_ODI_network/tree/502ad53119a12ff05a62d309e07ab480d18ae6bc" target="_blank">502ad53</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombernardliew2020ODInetworktree225cdeac69cb1cba22a0e111d880a454d028fa8etargetblank225cdeaa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/bernard-liew/2020_ODI_network/tree/225cdeac69cb1cba22a0e111d880a454d028fa8e" target="_blank">225cdea</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcombernardliew2020ODInetworktree502ad53119a12ff05a62d309e07ab480d18ae6bctargetblank502ad53a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcombernardliew2020ODInetworktree225cdeac69cb1cba22a0e111d880a454d028fa8etargetblank225cdeaa" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/bernard-liew/2020_ODI_network/tree/502ad53119a12ff05a62d309e07ab480d18ae6bc" target="_blank">502ad53</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/bernard-liew/2020_ODI_network/tree/225cdeac69cb1cba22a0e111d880a454d028fa8e" target="_blank">225cdea</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 </p>
 <pre><code>
 Ignored files:
-    Ignored:    .Rhistory
     Ignored:    .Rproj.user/
+
+Unstaged changes:
+    Modified:   analysis/2-network.Rmd
 
 </code></pre>
 <p>
@@ -552,6 +567,74 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/bernard-liew/2020_ODI_network/blob/ee49c01fa70644b0eee2a5f63ccb67bafb936728/analysis/2-network.Rmd" target="_blank">ee49c01</a>
+</td>
+<td>
+Liew
+</td>
+<td>
+2021-01-08
+</td>
+<td>
+redo analysis post update
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/bernard-liew/2020_ODI_network/blob/b243fbfd034364e33fbeb2f1abb7a2aff25730d1/analysis/2-network.Rmd" target="_blank">b243fbf</a>
+</td>
+<td>
+Liew
+</td>
+<td>
+2021-01-07
+</td>
+<td>
+redo analysis after updating bootneet
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/bernard-liew/2020_ODI_network/blob/661e55cd2a171c86be790bec4fd53052a356b6c8/analysis/2-network.Rmd" target="_blank">661e55c</a>
+</td>
+<td>
+Liew
+</td>
+<td>
+2020-12-18
+</td>
+<td>
+augmented mgm code to furrr and removed missing first
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/bernard-liew/2020_ODI_network/8bd4b9a68f815dfb0ff9c5d915769c81ccf98509/docs/2-network.html" target="_blank">8bd4b9a</a>
+</td>
+<td>
+bernard-liew
+</td>
+<td>
+2020-11-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -658,129 +741,22 @@ rm (list = ls(pattern = &quot;temp&quot;))</code></pre>
 
 my_huge &lt;- function (df) {
 
-  df[, grepl (&quot;Q&quot;, names(df))] &lt;- huge.npn (df[, grepl (&quot;Q&quot;, names(df))] )
+  df[, grepl (&quot;Q&quot;, names(df))] &lt;- huge::huge.npn (df[, grepl (&quot;Q&quot;, names(df))] )
 
   return (df)
 
 }</code></pre>
 </div>
-<div id="analyse-without-groups-as-variable" class="section level3">
-<h3>Analyse without groups as variable</h3>
-<div id="analyse-data-with-missing" class="section level4">
-<h4>Analyse data with missing</h4>
-<pre class="r"><code>dat &lt;- df$odi 
-
-plan (multisession)
-set.seed(1)
-
-res_raw &lt;- dat %&gt;%
-  select (time, data) %&gt;%
-  # Transform data
-  mutate (data = map(data, huge.npn)) %&gt;%
-  # Estimate network
-  mutate (nw = map (data,
-                    estimateNetwork,
-                    default=&quot;EBICglasso&quot;,
-                    corMethod = &quot;cor&quot;,
-                    tuning = 0.5,
-                    lambda.min.ratio = 0.001,
-                    corArgs =
-                      list(method = &quot;pearson&quot;,
-                           use = &quot;pairwise.complete.obs&quot;)),
-          # Get centrality measures
-          centr = map (nw, centralityTable),
-          # Bootstrap by case to get stability of centrality
-          centr_stb = future_map (nw,
-                                  bootnet,
-                                  default=&quot;EBICglasso&quot;,
-                                  corMethod = &quot;cor&quot;,
-                                  tuning = 0.5,
-                                  lambda.min.ratio = 0.001,
-                                  nBoots = B,
-                                  type = &quot;case&quot;,
-                                  statistics = stats_type,
-                                  corArgs =
-                                    list(method = &quot;pearson&quot;,
-                                         use = &quot;pairwise.complete.obs&quot;)),
-          # Stability measure
-          cor_stb = map (centr_stb,
-                         corStability),
-          # Bootstrap to get edgeweights stability
-          edgewts = future_map (nw,
-                                bootnet,
-                                default=&quot;EBICglasso&quot;,
-                                corMethod = &quot;cor&quot;,
-                                tuning = 0.5,
-                                lambda.min.ratio = 0.001,
-                                nBoots = B,
-                                corArgs =
-                                  list(method = &quot;pearson&quot;,
-                                       use = &quot;pairwise.complete.obs&quot;)))
-
-saveRDS(res_raw, &quot;output/raw.RDS&quot;)</code></pre>
-</div>
-<div id="analyse-data-with-complete" class="section level4">
-<h4>Analyse data with complete</h4>
-<pre class="r"><code>plan (multisession)
-set.seed(1)
-
-res_com &lt;- dat %&gt;%
-  select (time, data_com) %&gt;%
-  rename (data = data_com) %&gt;%
-  # Transform data
-  mutate (data = map(data, huge.npn)) %&gt;%
-  # Estimate network
-  mutate (nw = map (data,
-                    estimateNetwork,
-                    default=&quot;EBICglasso&quot;,
-                    corMethod = &quot;cor&quot;,
-                    tuning = 0.5,
-                    lambda.min.ratio = 0.001,
-                    corArgs =
-                      list(method = &quot;pearson&quot;,
-                           use = &quot;pairwise.complete.obs&quot;)),
-          # Get centrality measures
-          centr = map (nw, centralityTable),
-          # Bootstrap by case to get stability of centrality
-          centr_stb = future_map (nw,
-                                  bootnet,
-                                  default=&quot;EBICglasso&quot;,
-                                  corMethod = &quot;cor&quot;,
-                                  tuning = 0.5,
-                                  lambda.min.ratio = 0.001,
-                                  nBoots = B,
-                                  type = &quot;case&quot;,
-                                  statistics = stats_type,
-                                  corArgs =
-                                    list(method = &quot;pearson&quot;,
-                                         use = &quot;pairwise.complete.obs&quot;)),
-          # Stability measure
-          cor_stb = map (centr_stb,
-                         corStability),
-          # Bootstrap to get edgeweights stability
-          edgewts = future_map (nw,
-                                bootnet,
-                                default=&quot;EBICglasso&quot;,
-                                corMethod = &quot;cor&quot;,
-                                tuning = 0.5,
-                                lambda.min.ratio = 0.001,
-                                nBoots = B,
-                                corArgs =
-                                  list(method = &quot;pearson&quot;,
-                                       use = &quot;pairwise.complete.obs&quot;)))
-
-saveRDS(res_com, &quot;output/com.RDS&quot;)</code></pre>
-</div>
-</div>
 <div id="analyse-with-groups-as-variable" class="section level3">
 <h3>Analyse with groups as variable</h3>
-<div id="analyse-data-with-missing-1" class="section level4">
-<h4>Analyse data with missing</h4>
-<pre class="r"><code>dat &lt;- df$odi_mgm 
+<pre class="r"><code>#### Analyse data with missing
+dat &lt;- df$odi_mgm 
 set.seed(1)
 
 res_mgm_raw &lt;- dat %&gt;%
-  select (time, data) %&gt;%
+  select (time, data) %&gt;% 
+  # remove cases with missing columns
+  mutate (data = map (data, na.omit)) %&gt;%
   # Transform data
   mutate (data = map(data, my_huge)) %&gt;%
   # Estimate network
@@ -800,32 +776,17 @@ res_mgm_raw &lt;- dat %&gt;%
   mutate (centr = map (nw, centralityTable)) 
 
 
-# Furrr throws up error with mgm, switched to doParallel
 # Bootstrap by case to get stability of centrality
-doParallel::registerDoParallel(4)
 B &lt;- 2000
+plan (multisession)
 
-centr_stb_list &lt;- list()
-
-centr_stb_list &lt;-  foreach (n = 1: nrow (dat)) %dopar% {
-  bootnet::bootnet (res_mgm_raw$data[[n]],
-                     default = &quot;mgm&quot;,
-                     .type= c(&quot;c&quot;, rep(&quot;g&quot;, 10)),
-                     level= c(2, rep(1, 10)),
-                     criterion  = &quot;CV&quot;,          
-                     nFolds = 10,            
-                     order = 2,                       
-                     binarySign = TRUE,
-                     scale = TRUE,
-                    .pbar = FALSE,
-                    .signInfo = FALSE,
-                    nBoots = B,
-                    type = &quot;case&quot;,
-                    statistics = stats_type)
-  
-}
-
-res_mgm_raw$centr_stb &lt;- centr_stb_list
+res_mgm_raw &lt;- res_mgm_raw %&gt;%
+  mutate (centr_stb = future_map (nw, 
+                                  bootnet, 
+                                  nBoots = B,
+                                  type = &quot;case&quot;,
+                                  statistics = stats_type,
+                                  .options = furrr_options(seed = TRUE)))
 
 # Stability measure
 res_mgm_raw &lt;- res_mgm_raw %&gt;%
@@ -833,109 +794,16 @@ res_mgm_raw &lt;- res_mgm_raw %&gt;%
                          corStability))
 
 # Bootstrap by case to get stability of centrality
-edgewts_list &lt;- list()
+plan (multisession)
 
-edgewts_list &lt;-  foreach (n = 1: nrow (dat)) %dopar% {
-  bootnet::bootnet (res_mgm_raw$nw[[n]],
-                    default = &quot;mgm&quot;,
-                     .type= c(&quot;c&quot;, rep(&quot;g&quot;, 10)),
-                     level= c(2, rep(1, 10)),
-                     criterion  = &quot;CV&quot;,          
-                     nFolds = 10,            
-                     order = 2,                       
-                     binarySign = TRUE,
-                     scale = TRUE,
-                    .pbar = FALSE,
-                    .signInfo = FALSE,
-                    nBoots = B)
-  
-}
+res_mgm_raw &lt;- res_mgm_raw %&gt;%
+  mutate (edgewts = future_map (nw, 
+                                  bootnet, 
+                                  nBoots = B,
+                                .options = furrr_options(seed = TRUE)))
 
-res_mgm_raw$edgewts &lt;- edgewts_list
 
 saveRDS(res_mgm_raw, &quot;output/mgm_raw.RDS&quot;)</code></pre>
-</div>
-<div id="analyse-data-with-complete-1" class="section level4">
-<h4>Analyse data with complete</h4>
-<pre class="r"><code>set.seed(1)
-
-res_mgm_com &lt;- dat %&gt;%
-  select (time, data_com) %&gt;%
-  rename (data = data_com) %&gt;%
-  # Transform data
-  mutate (data = map(data, my_huge)) %&gt;%
-  # Estimate network
-  mutate (nw = map (data,
-                    estimateNetwork,
-                    default = &quot;mgm&quot;,
-                     type= c(&quot;c&quot;, rep(&quot;g&quot;, 10)),
-                     level= c(2, rep(1, 10)),
-                     criterion  = &quot;CV&quot;,            # we used cross validation to select optimal tuning parameter
-                     nFolds = 10,            # using 10 folds
-                     order = 2,                       # we only include second order interactions
-                     binarySign = TRUE,
-                     scale = TRUE,
-                    .pbar = FALSE,
-                    .signInfo = FALSE)) %&gt;%
-  # Get centrality measures
-  mutate (centr = map (nw, centralityTable)) 
-
-
-# Furrr throws up error with mgm, switched to doParallel
-# Bootstrap by case to get stability of centrality
-doParallel::registerDoParallel(4)
-B &lt;- 2000
-
-centr_stb_list &lt;- list()
-
-centr_stb_list &lt;-  foreach (n = 1: nrow (dat)) %dopar% {
-  bootnet::bootnet (res_mgm_com$data[[n]],
-                     default = &quot;mgm&quot;,
-                     .type= c(&quot;c&quot;, rep(&quot;g&quot;, 10)),
-                     level= c(2, rep(1, 10)),
-                     criterion  = &quot;CV&quot;,          
-                     nFolds = 10,            
-                     order = 2,                       
-                     binarySign = TRUE,
-                     scale = TRUE,
-                    .pbar = FALSE,
-                    .signInfo = FALSE,
-                    nBoots = B,
-                    type = &quot;case&quot;,
-                    statistics = stats_type)
-  
-}
-
-res_mgm_com$centr_stb &lt;- centr_stb_list
-
-# Stability measure
-res_mgm_com &lt;- res_mgm_com %&gt;%
-  mutate (cor_stb = map (centr_stb,
-                         corStability))
-
-# Bootstrap by case to get stability of centrality
-doParallel::registerDoParallel(4)
-edgewts_list &lt;- list()
-
-edgewts_list &lt;-  foreach (n = 1: nrow (dat)) %dopar% {
-  bootnet::bootnet (res_mgm_com$nw[[n]],
-                    default = &quot;mgm&quot;,
-                     .type= c(&quot;c&quot;, rep(&quot;g&quot;, 10)),
-                     level= c(2, rep(1, 10)),
-                     criterion  = &quot;CV&quot;,          
-                     nFolds = 10,            
-                     order = 2,                       
-                     binarySign = TRUE,
-                     scale = TRUE,
-                    .pbar = FALSE,
-                    .signInfo = FALSE,
-                    nBoots = B)
-  
-}
-
-res_mgm_com$edgewts &lt;- edgewts_list
-
-saveRDS(res_mgm_com, &quot;output/mgm_com.RDS&quot;)</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -944,7 +812,6 @@ saveRDS(res_mgm_com, &quot;output/mgm_com.RDS&quot;)</code></pre>
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
-</div>
 </div>
 </div>
 </div>
@@ -963,6 +830,8 @@ footer is added to webpages before the MathJax javascript. -->
 </script>
 
 
+
+
 </div>
 </div>
 
@@ -972,7 +841,7 @@ footer is added to webpages before the MathJax javascript. -->
 
 // add bootstrap table styles to pandoc tables
 function bootstrapStylePandocTables() {
-  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
 }
 $(document).ready(function () {
   bootstrapStylePandocTables();

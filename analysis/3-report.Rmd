@@ -75,7 +75,7 @@ nodes <- colnames (res$data[[1]])
 
 ## Descriptive statistics 
 
-```{r}
+```{r fig.height=15, fig.width=20, message=FALSE, warning=FALSE}
 df <- readRDS("output/dat_odi_nest.RDS")
 
 temp1 <- df$raw %>% select (-data_mgm)
@@ -121,11 +121,13 @@ df_plot <- df2 %>%
         colour = "Group") +
   theme_cowplot() + 
   theme(text = element_text(size=16),
-        axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) 
+        axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+ 
+ f
 
-pdf(width = 15, height = 8, file = "../manuscript_odi_nw/sm_fig1.pdf")
-f
-dev.off()
+# pdf(width = 15, height = 8, file = "../manuscript_odi_nw/sm_fig1.pdf")
+# f
+# dev.off()
 ```
 
 ### Plot network
@@ -136,14 +138,14 @@ Red edges - negative correlation
 
 The thickness of the edges indicate the magnitude of correlation.
 
-```{r}
+```{r fig.height=15, fig.width=20, message=FALSE, warning=FALSE}
 
-par (mfrow = c(2,3))
-p1 <- plot (res$nw[[1]], title = "Baseline", label.cex = 2, vsize = 15, curve = 0.4, curveAll = TRUE, labels = nodeLabs)
-plot (res$nw[[2]], title = "Week 5", layout = p1$layout, label.cex = 2, vsize = 15, curve = 0.4, curveAll = TRUE, labels = nodeLabs)
-plot (res$nw[[3]], title = "Week 10", layout = p1$layout, label.cex = 2, vsize = 15, curve = 0.4, curveAll = TRUE, labels = nodeLabs)
-plot (res$nw[[4]], title = "Week 26", layout = p1$layout, label.cex = 2, vsize = 15, curve = 0.4, curveAll = TRUE, labels = nodeLabs)
-plot (res$nw[[5]], title = "Week 52", layout = p1$layout, label.cex = 2, vsize = 15, curve = 0.4, curveAll = TRUE, labels = nodeLabs)
+par (mfrow = c(3,2))
+p1 <- plot (res$nw[[1]], title = "Baseline", label.cex = 2, vsize = 15, curve = 0.4, curveAll = TRUE, labels = nodeLabs, title.cex = 4)
+plot (res$nw[[2]], title = "Week 5", layout = p1$layout, label.cex = 2, vsize = 15, curve = 0.4, curveAll = TRUE, labels = nodeLabs, title.cex = 4)
+plot (res$nw[[3]], title = "Week 10", layout = p1$layout, label.cex = 2, vsize = 15, curve = 0.4, curveAll = TRUE, labels = nodeLabs, title.cex = 4)
+plot (res$nw[[4]], title = "Week 26", layout = p1$layout, label.cex = 2, vsize = 15, curve = 0.4, curveAll = TRUE, labels = nodeLabs, title.cex = 4)
+plot (res$nw[[5]], title = "Week 52", layout = p1$layout, label.cex = 2, vsize = 15, curve = 0.4, curveAll = TRUE, labels = nodeLabs, title.cex = 4)
 # plot.new()
 # addtable2plot(0,0,node_df, 
 #               xpad=1, ypad=1,
@@ -154,7 +156,7 @@ plot (res$nw[[5]], title = "Week 52", layout = p1$layout, label.cex = 2, vsize =
 
 ```
 
-```{r, eval = FALSE}
+```{r, eval = FALSE, include = FALSE}
 pdf(width = 30, height = 20, file = "../manuscript_odi_nw/fig1.pdf")
 par (mfrow = c(2,3))
 p1 <- plot (res$nw[[1]], title = "Baseline", label.cex = 1, vsize = 15, curve = 0.4, curveAll = TRUE, labels = nodeLabs, title.cex = 4)
@@ -210,25 +212,25 @@ cat ("The edge with the greatest weight magnitude was between", x_max[["node1"]]
 ```
 
 ### Plot edge weights stability
+
 #### Confidence interval
 
-See which edges differ from each other in size significantly (to answer the question is edge A significantly larger than edge B).
 
-```{r fig.height=40, fig.width=15, message=FALSE, warning=FALSE}
+```{r fig.height=30, fig.width=20, message=FALSE, warning=FALSE}
 w_fig <- map (res$edgewts, plot, order = "sample", CIstyle = "quantiles")
 
 w_fig <- map (w_fig, ~.x + 
-                scale_y_binned(labels = nodeLabs) + 
                   theme(text = element_text(size = 16)), 
               include = "all", print = FALSE, scale = "relative")
 
-cowplot::plot_grid(plotlist = w_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), vjust = 1, hjust = -1, ncol = 1)
+cowplot::plot_grid(plotlist = w_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26", "wk52" ), 
+                   vjust = 1, hjust = -1, ncol = 2)
 
 
 
 ```
 
-```{r, eval = FALSE}
+```{r, eval = FALSE, include = FALSE}
 w_fig <- map (res$edgewts, plot, order = "sample", CIstyle = "quantiles")
 
 w_fig <- map (w_fig, ~.x + 
@@ -243,9 +245,10 @@ dev.off()
 
 ```
 
-#### Hypothesis testing
 
-```{r fig.height=15, fig.width=15, message=FALSE, warning=FALSE}
+
+```{r, eval = FALSE, include = FALSE}
+#### Hypothesis testing
 wp_fig <- map (res$edgewts, plot, plot = "difference", 
               satistics = "edge", order = "sample", onlyNonZero = TRUE)
 
@@ -259,7 +262,7 @@ cowplot::plot_grid(plotlist = wp_fig, labels = c("Wk0","Wk 5", "Wk 10", "Wk 26",
 ```
 
 
-```{r eval = FALSE}
+```{r, eval = FALSE, include = FALSE}
 wp_fig <- map (res$edgewts, plot, plot = "difference", 
               satistics = "edge", order = "sample", onlyNonZero = TRUE)
 
